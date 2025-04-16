@@ -1,0 +1,44 @@
+<!doctype html>
+{% load static plotly_dash django_bootstrap5 %}
+
+<html lang="tr">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description"
+          content="Pamukkale Üniversitesi, Machine Learning, Data Science, Software Engineering Student Researcher PhD Researcher Cyber Security Student Veri Bilimi Example Project Student Researcher Algoritms "/>
+    <meta name="author" content="PhD. Mehmet Erdem ÖZER">
+    <meta name="email" content="mozer232@posta.pau.edu.tr, ozer246@gmail.com">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}">
+    <link rel="icon" href="{% static 'images/1744819686631.jpg' %}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/android-chrome-192x192.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static "images/favicon-32x32.png" %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static "images/favicon-16x16.png" %}">
+
+    <link rel="canonical" href="{% static "images/android-chrome-512x512.png" %}">
+
+
+    <title> ChatwithLMM </title>
+
+    {% plotly_header %}
+
+</head>
+<body>
+
+
+<main>
+
+    {% plotly_direct name="ask" %}
+
+</main>
+
+{% plotly_footer %}
+
+
+</body>
+</html>
+
