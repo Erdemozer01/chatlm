@@ -439,7 +439,7 @@ function getClientRect(offsets) {
 function getBoundingClientRect(element) {
   var rect = {};
 
-  // IE10 10 FIX: Please, don't ask, the element isn't
+  // IE10 10 FIX: Please, don't llm, the element isn't
   // considered in DOM in some circumstances...
   // This isn't reproducible in IE10 compatibility mode of IE11
   try {

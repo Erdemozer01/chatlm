@@ -1,137 +1,69 @@
-/* Chat içerisindeki Markdown bileşeninin içindeki <pre> etiketlerini hedefler */
+/* Genel gövde ve temel metin stilleri (Zaten olabilir, kontrol edin) */
+body {
+    font-family: 'Segoe UI', sans-serif; /* Kullandığınız font */
+    margin: 0;
+    padding: 0;
+    background-color: var(--app-bg-color); /* Tema değişkenleri kullanıyorsanız */
+    color: var(--app-color); /* Tema değişkenleri kullanıyorsanız */
+}
+
+/* Chat Log alanı stilleri (Zaten var) */
+#chat-log {
+    /* ... mevcut stiller ... */
+    overflow-y: auto; /* Dikey kaydırma */
+    /* overflow-x: hidden;  Gerekiyorsa yatay kaydırmayı engellemek için */
+}
+
+/* Markdown içeriği içindeki kod blokları için stiller */
+/* .chat-markdown sınıfını kullanarak spesifik hedefleme yapıyoruz */
 .chat-markdown pre {
-    white-space: pre-wrap !important; /* Satırların otomatik olarak alt satıra geçmesini sağlar, boşlukları korur */
-    word-wrap: break-word !important; /* Çok uzun, bölünemeyen kelimelerin (URL gibi) taşmasını engeller */
-    overflow-x: auto !important; /* Gerekirse (nadiren) yatay kaydırma çubuğu ekler */
-    max-width: 100%; /* Konteynerinin %100'ünden fazla genişlememesini sağlar */
-    /* İsteğe bağlı: Kod bloğu için iç boşluk ve arka plan */
-    padding: 0.8em;
-    border-radius: 6px;
-    background-color: rgba(0, 0, 0, 0.04); /* Açık tema için hafif gri */
-    font-size: 0.85em; /* Kod fontunu biraz küçültebiliriz */
+    word-wrap: break-word;       /* Uzun kelimeleri/satırları böl */
+    overflow-wrap: break-word;   /* word-wrap'ın standartlaşmış versiyonu */
+    white-space: pre-wrap;       /* Whitespace'i koru ama sarmaya izin ver */
+    word-break: break-all;       /* Herhangi bir noktada kelimeyi kırabilir */
+    max-width: 100%;             /* Konteyner genişliğinin %100'ünü geçmemeli */
+    overflow-x: auto;            /* Eğer sarma yetmezse yatay kaydırma çubuğu ekle */
+    padding: 10px;               /* İsteğe bağlı: Kod bloğu içine boşluk ekle */
+    background-color: #f0f0f0;   /* İsteğe bağlı: Kod bloğu arka plan rengi (temaya göre ayarlanmalı) */
+    border-radius: 5px;          /* İsteğe bağlı: Köşeleri yuvarla */
 }
 
-/* <pre> içindeki <code> etiketinin de doğru davranmasını sağlar */
+/* Kod bloğu içindeki 'code' etiketi için stil */
 .chat-markdown pre code {
-    white-space: inherit !important; /* <pre> etiketinin wrap ayarını miras alır */
-    display: block !important; /* Tam genişlik kaplamasını ve kaydırmayı sağlar */
-    overflow-x: inherit !important;
-    background: none !important; /* Code etiketi için ekstra arkaplanı kaldır */
-    padding: 0 !important; /* Code etiketi için ekstra padding'i kaldır */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    word-break: break-all;
+    /* İsteğe bağlı: Kod metni rengi (temaya göre ayarlanmalı) */
+    /* color: #333; */
 }
 
-/* --- Koyu Tema için Kod Bloğu Stilleri (İsteğe Bağlı) --- */
-/* update_styles callback'inin app-container'a 'theme-dark' class'ı eklediğini varsayar */
-.theme-dark .chat-markdown pre {
-    background-color: rgba(255, 255, 255, 0.1); /* Koyu tema için farklı arka plan */
-    /* color: #f1f1f1; */ /* Gerekirse metin rengi ayarı */
+/* Satır içi (inline) kod için stil */
+.chat-markdown code {
+    /* İsteğe bağlı: Satır içi kod arka planı ve rengi */
+    /* background-color: #e0e0e0; */
+    /* padding: 2px 4px; */
+    /* border-radius: 3px; */
+    /* color: #c7254e; */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
-/* Scrollbar stilini iyileştirme (tarayıcıya göre değişir, isteğe bağlı) */
-.chat-markdown pre::-webkit-scrollbar {
-    height: 8px;
+/* Eğer temaya özel kod bloğu renkleri istiyorsanız, bunları tema callback'inde yönetebilir
+   veya CSS değişkenleri kullanabilirsiniz. Örneğin: */
+/*
+.chat-markdown pre {
+    background-color: var(--code-block-bg);
+    color: var(--code-block-color);
 }
-
-.chat-markdown pre::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+body.dark-theme { // Body etiketine eklediğiniz bir sınıf
+    --code-block-bg: #3a3a3a;
+    --code-block-color: #e0e0e0;
 }
-
-.theme-dark .chat-markdown pre::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
+body.light-theme { // Body etiketine eklediğiniz bir sınıf
+    --code-block-bg: #f0f0f0;
+    --code-block-color: #333;
 }
-
-/* ==========================
-   Offcanvas Menu Güzelleştirmeleri
-   ========================== */
-
-/* Genel Menü Linkleri (Alt Kısım) */
-#offcanvas-menu-bottom a,
-#offcanvas-menu-bottom .dash-link { /* dcc.Link için */
-    display: flex; /* İkon ve metni yan yana hizala */
-    align-items: center; /* Dikeyde ortala */
-    padding: 10px 12px; /* İç boşluk (Tıklama alanını artırır) */
-    margin-bottom: 5px; /* Linkler arası boşluk */
-    border-radius: 6px; /* Köşeleri yuvarla */
-    text-decoration: none;
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; /* Yumuşak geçiş */
-    /* Renkler callback'ten veya aşağıdaki tema kurallarından gelecek */
-}
-
-/* Link içindeki ikonlar */
-#offcanvas-menu-bottom a i,
-#offcanvas-menu-bottom .dash-link i {
-    margin-right: 12px; /* İkon ve metin arası boşluk */
-    width: 20px; /* İkonlar için sabit genişlik */
-    text-align: center; /* İkonu kendi alanında ortala */
-    flex-shrink: 0; /* İkonun daralmamasını sağla */
-}
-
-/* --- Koyu Tema Hover Efektleri --- */
-.theme-dark #offcanvas-menu-bottom a:hover,
-.theme-dark #offcanvas-menu-bottom .dash-link:hover {
-    background-color: rgba(100, 181, 246, 0.15); /* Üzerine gelince hafif açık mavi arka plan */
-    color: #90caf9; /* Üzerine gelince daha açık link rengi */
-}
-
-/* Menü başlığı için belki biraz daha belirgin stil */
-#offcanvas-menu h4 {
-    font-weight: 600;
-    opacity: 0.9;
-}
-
-/* İsteğe bağlı: Scrollbar Stili (Webkit tarayıcılar için) */
-#offcanvas-menu::-webkit-scrollbar {
-    width: 6px;
-}
-
-#offcanvas-menu::-webkit-scrollbar-track {
-    background: transparent; /* Veya menü arka planına uygun hafif bir renk */
-}
-
-#offcanvas-menu::-webkit-scrollbar-thumb {
-    background-color: rgba(128, 128, 128, 0.4); /* Yarı saydam gri */
-    border-radius: 3px;
-}
-
-.theme-dark #offcanvas-menu::-webkit-scrollbar-thumb {
-    background-color: rgba(200, 200, 200, 0.4); /* Koyu temada daha açık */
-}
-
-/* assets/custom.css içine ekleyin veya güncelleyin */
-
-
-.theme-dark #new-chat-button:focus {
-    box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.3); /* Koyu tema için focus rengi */
-}
-
-/* assets/custom.css */
-
-/* Yeni Sohbet Butonu - Temel ve Hover/Focus */
-#new-chat-button {
-    /* Layout'tan gelen padding, margin vb. üzerine ek stil gerekirse buraya */
-    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out; /* Renk geçişi */
-}
-
-/* Açık Tema Hover */
-.theme-light #new-chat-button:hover {
-    background-color: rgba(0, 0, 0, 0.04) !important; /* Çok hafif gri bir arka plan */
-    color: #0056b3 !important; /* Metin rengi biraz koyulaşabilir */
-    border: none !important;
-    box-shadow: none !important;
-}
-
-/* Koyu Tema Hover */
-.theme-dark #new-chat-button:hover {
-    background-color: rgba(255, 255, 255, 0.08) !important; /* Çok hafif beyazımsı bir arka plan */
-    color: #90caf9 !important; /* Metin rengi biraz açılabilir */
-    border: none !important;
-    box-shadow: none !important;
-}
-
-/* Odaklanma (Focus) stilini de kaldıralım */
-#new-chat-button:focus {
-    box-shadow: none !important;
-    outline: none !important;
-    background-color: transparent !important; /* Odaklanınca da arka plan olmasın */
-}
+*/

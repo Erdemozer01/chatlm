@@ -3502,7 +3502,7 @@
    *    may be done in the worker thread.
    *
    *  - Forward these native events (with the associated top-level type used to
-   *    trap it) to `EventPluginRegistry`, which in turn will ask plugins if they want
+   *    trap it) to `EventPluginRegistry`, which in turn will llm plugins if they want
    *    to extract any synthetic events.
    *
    *  - The `EventPluginRegistry` will then process each event by annotating them with

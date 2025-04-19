@@ -26,8 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -35,11 +33,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ask.apps.AskConfig',
+    #################################
+    'llm.apps.LlmConfig',
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
     'channels',
     'django_bootstrap5',
-
+    #################################
 ]
 
 MIDDLEWARE = [
@@ -125,6 +124,10 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+LOGOUT_REDIRECT_URL = '/login/'
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

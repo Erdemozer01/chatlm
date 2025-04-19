@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dash Basit Test</title>
+    {% load plotly_dash %}
+</head>
+<body>
+    <h1>Dash Callback Tetikleme Test Uygulaması</h1>
+
+    <p>Aşağıdaki Dash uygulaması, buton tıklamasıyla bir Store'u, o Store'un diğerini, onun da alttaki yazıyı güncellemesini test eder.</p>
+
+    {% plotly_app name=dash_app_name %}
+
+    <p>Test Adımları:</p>
+    <ol>
+        <li>Sayfa yüklendiğinde terminal loglarına bakın. Sadece başlangıç logları olmalı, callback 1, 2, 3 tetiklenmemeli.</li>
+        <li>"Değeri Artır" butonuna tıklayın.</li>
+        <li>Terminal loglarına bakın. Callback 1 -> Callback 2 -> Callback 3 zincirinin tetiklendiğini gösteren logları sırayla görmelisiniz.</li>
+        <li>Sayfadaki "Burada Store B değeri görünecek." yazısının güncellenip güncellenmediğini kontrol edin.</li>
+        <li>Butona birkaç kez daha tıklayıp logları ve yazının tekrar güncellenip güncellenmediğini izleyin.</li>
+    </ol>
+
+</body>
+</html>
