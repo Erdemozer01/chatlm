@@ -1,69 +1,111 @@
-/* Genel gövde ve temel metin stilleri (Zaten olabilir, kontrol edin) */
-body {
-    font-family: 'Segoe UI', sans-serif; /* Kullandığınız font */
-    margin: 0;
-    padding: 0;
-    background-color: var(--app-bg-color); /* Tema değişkenleri kullanıyorsanız */
-    color: var(--app-color); /* Tema değişkenleri kullanıyorsanız */
+/* static/css/style.css dosyanıza ekleyin */
+
+/* --- Menü Konteyneri Stilleri (İsteğe bağlı, update_styles'ta çoğu ayarlı) --- */
+#offcanvas-menu {
+    /* Update_styles callback'indeki genişlik, arka plan, border, padding, position gibi stiller geçerlidir. */
+    /* Buraya sadece update_styles tarafından yönetilmeyen ek genel menü konteyner stillerini ekleyebilirsiniz. */
+    /* color: var(--menu-color); *//* update_styles yönetiyor */
 }
 
-/* Chat Log alanı stilleri (Zaten var) */
-#chat-log {
-    /* ... mevcut stiller ... */
-    overflow-y: auto; /* Dikey kaydırma */
-    /* overflow-x: hidden;  Gerekiyorsa yatay kaydırmayı engellemek için */
+/* --- Menüdeki Ayırıcı Çizgi Stili (Update_styles'ta ayarlı) --- */
+#menu-hr {
+    /* border-color: var(--hr-color); *//* update_styles yönetiyor */
+    /* margin: 15px 0; *//* update_styles yönetiyor */
 }
 
-/* Markdown içeriği içindeki kod blokları için stiller */
-/* .chat-markdown sınıfını kullanarak spesifik hedefleme yapıyoruz */
-.chat-markdown pre {
-    word-wrap: break-word;       /* Uzun kelimeleri/satırları böl */
-    overflow-wrap: break-word;   /* word-wrap'ın standartlaşmış versiyonu */
-    white-space: pre-wrap;       /* Whitespace'i koru ama sarmaya izin ver */
-    word-break: break-all;       /* Herhangi bir noktada kelimeyi kırabilir */
-    max-width: 100%;             /* Konteyner genişliğinin %100'ünü geçmemeli */
-    overflow-x: auto;            /* Eğer sarma yetmezse yatay kaydırma çubuğu ekle */
-    padding: 10px;               /* İsteğe bağlı: Kod bloğu içine boşluk ekle */
-    background-color: #f0f0f0;   /* İsteğe bağlı: Kod bloğu arka plan rengi (temaya göre ayarlanmalı) */
-    border-radius: 5px;          /* İsteğe bağlı: Köşeleri yuvarla */
+
+/* --- Yeni Sohbet Butonu Stilleri --- */
+#new-chat-button {
+    /* Update_styles callback'inde arka plan, renk, padding, border vb. ayarlanıyor. */
+    /* Buraya hover gibi statik stiller ekleyin */
+    transition: background-color 0.2s ease-in-out; /* Yumuşak geçiş efekti */
 }
 
-/* Kod bloğu içindeki 'code' etiketi için stil */
-.chat-markdown pre code {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
-    word-break: break-all;
-    /* İsteğe bağlı: Kod metni rengi (temaya göre ayarlanmalı) */
-    /* color: #333; */
+#new-chat-button:hover {
+    /* Hover olduğunda arka plan rengini biraz koyulaştır veya değiştir */
+    /* Renkleri temaya göre ayarlamak için CSS değişkenleri veya daha spesifik kurallar gerekebilir */
+     background-color: #b0d8f5; /* Açık tema hover rengi örneği */
+     /* Koyu tema için: background-color: #3c4045; */
 }
 
-/* Satır içi (inline) kod için stil */
-.chat-markdown code {
-    /* İsteğe bağlı: Satır içi kod arka planı ve rengi */
-    /* background-color: #e0e0e0; */
-    /* padding: 2px 4px; */
-    /* border-radius: 3px; */
-    /* color: #c7254e; */
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
-    word-break: break-all;
+/* Eğer tema bazlı hover rengi CSS ile yapılıyorsa, body.dark-theme gibi sınıfları kullanmanız gerekir. */
+/* Örneğin: */
+body.light-theme #new-chat-button:hover {
+    background-color: #b0d8f5;
+}
+body.dark-theme #new-chat-button:hover {
+     background-color: #3c4045;
 }
 
-/* Eğer temaya özel kod bloğu renkleri istiyorsanız, bunları tema callback'inde yönetebilir
-   veya CSS değişkenleri kullanabilirsiniz. Örneğin: */
+
+/* --- Menü Alt Linkler Konteyneri (Update_styles'ta ayarlı) --- */
+#offcanvas-menu-bottom {
+     /* position, bottom, left, width, padding, background, border-top stilleri update_styles yönetiyor */
+     /* color: var(--link-color); *//* update_styles yönetiyor (link metin rengini miras alması için) */
+}
+
+/* --- Menü Altındaki Linklerin (html.A ve dcc.Link) Genel Stilleri --- */
+/* Layout'ta display: block, margin-bottom gibi temel stiller ayarlı. */
+/* Buraya ek görsel stiller ekleyebilirsiniz. */
+#offcanvas-menu-bottom a,
+#offcanvas-menu-bottom .dccLink { /* dcc.Link için genellikle bu sınıf kullanılır */
+    color: inherit; /* Metin rengini parenttan (offcanvas-menu-bottom) miras alsın (update_styles yönetiyor) */
+    padding: 8px 0; /* İsteğe bağlı: Linklere iç padding ekle (sol/sağ padding offcanvas padding'inden gelecek) */
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out; /* Geçiş efekti */
+    border-radius: 4px; /* İsteğe bağlı: Hafif köşeler */
+    text-decoration: none; /* Alt çizgiyi kaldır */
+    display: flex; /* İkon ve yazıyı yan yana hizala */
+    align-items: center; /* Dikey hizalama */
+}
+
+/* Menü Altındaki Linklerin Hover Stilleri */
+#offcanvas-menu-bottom a:hover,
+#offcanvas-menu-bottom .dccLink:hover {
+    text-decoration: none; /* Hover olunca da alt çizgi olmasın */
+    /* Hover arka plan rengi - temaya göre veya sabit */
+    background-color: #e9ecef; /* Açık tema hover arka plan örneği */
+    /* Koyu tema için: background-color: #495057; */
+
+    /* Hover metin rengi - temaya göre veya sabit */
+    color: #007bff; /* Açık tema hover metin rengi örneği */
+    /* Koyu tema için: color: #64b5f6; */
+
+    cursor: pointer; /* Fare imlecini el ikonuna çevir */
+}
+
+/* Eğer tema bazlı hover rengi CSS ile yapılıyorsa, body.dark-theme gibi sınıfları kullanmanız gerekir. */
+/* Örneğin: */
+body.light-theme #offcanvas-menu-bottom a:hover,
+body.light-theme #offcanvas-menu-bottom .dccLink:hover {
+     background-color: #e9ecef;
+     color: #007bff;
+}
+body.dark-theme #offcanvas-menu-bottom a:hover,
+body.dark-theme #offcanvas-menu-bottom .dccLink:hover {
+     background-color: #495057;
+     color: #64b5f6;
+}
+
+
+/* --- Alt Linklerdeki İkonların Stilleri --- */
+#offcanvas-menu-bottom a i,
+#offcanvas-menu-bottom .dccLink i {
+    margin-right: 8px; /* İkon ile yazı arasına boşluk */
+    /* color: inherit; *//* Metin renginden miras alacak */
+}
+
+/* --- Aktif Menü Linki Stili (Sonraki adım olabilir) --- */
+/* dcc.Location kullanarak aktif linkin URL'ini alıp, o linke bir sınıf ekleyip burada stilleyebilirsiniz */
 /*
-.chat-markdown pre {
-    background-color: var(--code-block-bg);
-    color: var(--code-block-color);
+#offcanvas-menu-bottom a.active-menu-link,
+#offcanvas-menu-bottom .dccLink.active-menu-link {
+    font-weight: bold;
+    background-color: #d0eaff;
+    color: #0056b3;
 }
-body.dark-theme { // Body etiketine eklediğiniz bir sınıf
-    --code-block-bg: #3a3a3a;
-    --code-block-color: #e0e0e0;
-}
-body.light-theme { // Body etiketine eklediğiniz bir sınıf
-    --code-block-bg: #f0f0f0;
-    --code-block-color: #333;
+body.dark-theme #offcanvas-menu-bottom a.active-menu-link,
+body.dark-theme #offcanvas-menu-bottom .dccLink.active-menu-link {
+    background-color: #4a4a4a;
+    color: #addeff;
 }
 */

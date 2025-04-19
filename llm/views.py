@@ -18,7 +18,7 @@ from langchain_anthropic.chat_models import ChatAnthropic
 
 # Yeni LangChain importları for RunnableWithMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_community.chat_message_histories import ChatMessageHistory # Veya kullandığınız diğer history class'ı
+from langchain_community.chat_message_histories import ChatMessageHistory  # Veya kullandığınız diğer history class'ı
 
 from langchain_core.prompts import PromptTemplate
 # LangChain mesaj türleri import edildi (zaten vardı, tekrar eklemeye gerek yoksa silin)
@@ -56,7 +56,7 @@ AI:
 """)
 
 custom_css = "static/css/style.css"
-js = "static/js/clientside.js"
+custom_js = "static/js/clientside.js"
 
 
 # Django View Fonksiyonu
@@ -64,7 +64,7 @@ def ChatLmmView(request):
     app = DjangoDash(
         name='ChatLLM',
         external_stylesheets=[dbc.themes.BOOTSTRAP, external_style, custom_css],
-        external_scripts=[js],
+        external_scripts=[custom_js],
         suppress_callback_exceptions=True
     )
 
@@ -78,7 +78,7 @@ def ChatLmmView(request):
             html.Div(
                 id='offcanvas-menu',
                 children=[
-                    html.H4('Menü', style={'marginBottom': '20px'}),
+                    html.P(f'Hoşgeldiniz, {request.user}', style={'marginBottom': '20px', 'marginTop': '20px', 'font-weight': 'bold'}),
                     # Hr için ID eklenmiş
                     html.Hr(id='menu-hr', style={'margin': '15px 0'}),
                     dbc.Button(
@@ -143,17 +143,13 @@ def ChatLmmView(request):
                                         id='dark-mode-button', n_clicks=0, title="Temayı değiştir",
                                         # Stil callback'ten
                                     ),
-                                    # --- LOGOUT LINKI EKLENİYOR ---
-                                    dbc.Button(
-                                        html.I(className="fas fa-sign-out-alt", style={'marginRight': '5px'}),
-                                        # Çıkış ikonu
-                                        href='accounts/logout/',  # Django projenizdeki çıkış URL'si
-                                        id='logout-link',
+                                    # --- LOGOUT LINKI  ---
+                                    html.Button(  # html.Button kullanıldı, ismini 'logout-button-trigger' yaptık
+                                        html.I(className="fas fa-sign-out-alt"),  # Sadece ikon
+                                        id='logout-button-trigger',
+                                        # Bu ID Clientside Callback'te ve style callback'te kullanılacak
                                         title="Çıkış Yap",
-                                        external_link=True,  # Burası eklendi! Standart tarayıcı navigasyonu için
-                                        # Stil callback'ten yönetilecek
-                                        style={'textDecoration': 'none', 'marginLeft': '15px'}
-                                        # Temel aralık, callback ezecek
+                                        n_clicks=0,  # Buton click sayacı
                                     ),
                                     # --- LOGOUT LINKI SONU ---
                                 ]
@@ -275,7 +271,7 @@ def ChatLmmView(request):
         Output('send-button', 'style'),  # 12
         Output('attach-file-button', 'style'),  # 13
         Output('menu-hr', 'style'),  # 14 (Hr için eklendi)
-        Output('logout-link', 'style'),  # 15 (Logout link stili eklendi)
+        Output('logout-button-trigger', 'style'),  # 15 (Logout link stili eklendi)
         # --- OUTPUTS SONU ---
         Input('theme-store', 'data'),  # Input 1
         Input('offcanvas-open', 'data')  # Input 2
@@ -333,11 +329,8 @@ def ChatLmmView(request):
         offcanvas_left = '0px' if is_offcanvas_open else '-250px'
         content_margin_left = '250px' if is_offcanvas_open else '0px'
 
-        # --- Stil Sözlükleri ---
         app_container_style = {'display': 'flex', 'height': '100vh', 'fontFamily': 'Segoe UI, sans-serif',
-                               'backgroundColor': app_bg, 'color': app_color,
-                               'overflow': 'hidden'}  # app_color tüm alt elementler için genel renk sağlar
-        # chat_log stilinde color kaldırıldı, genel app_color'dan miras alacak
+                               'backgroundColor': app_bg, 'color': app_color, 'overflow': 'hidden'}
         chat_log_style = {'flexGrow': 1, 'overflowY': 'auto', 'padding': '15px', 'backgroundColor': chat_bg,
                           'borderTop': f'1px solid {chat_border}', 'borderBottom': f'1px solid {chat_border}'}
         content_area_style = {'flexGrow': 1, 'display': 'flex', 'flexDirection': 'column', 'height': '100vh',
@@ -347,67 +340,49 @@ def ChatLmmView(request):
                             'border': f'1px solid {border_color}', 'backgroundColor': input_bg, 'color': input_color}
         top_bar_style = {'padding': '10px 15px', 'backgroundColor': top_bar_bg,
                          'borderBottom': f'1px solid {top_bar_border}', 'display': 'flex', 'alignItems': 'center',
-                         'justifyContent': 'space-between', 'color': app_color}  # Top barın kendi metin rengi
+                         'justifyContent': 'space-between', 'color': app_color}
         input_area_style = {'padding': '15px', 'display': 'flex', 'alignItems': 'center',
                             'borderTop': f'1px solid {input_area_border}', 'backgroundColor': input_area_bg}
-        # Menü Stilleri
-        # offcanvas_menu style'ında color kaldırıldı, genel app_color'dan miras alacak (veya menu_color kullanılabilir)
         offcanvas_menu_style = {'width': '250px', 'backgroundColor': menu_bg, 'borderRight': f'1px solid {menu_border}',
                                 'padding': '20px', 'position': 'fixed', 'top': 0, 'left': offcanvas_left, 'bottom': 0,
                                 'zIndex': 1050, 'transition': 'left 0.3s ease-in-out', 'overflowY': 'auto',
-                                'color': menu_color, 'display': 'flex',
-                                'flexDirection': 'column'}  # Menu ana metin rengi kullanıldı
-        hr_style = {'borderColor': hr_color, 'margin': '15px 0'}  # Hr stili
-        new_chat_button_style = {  # New Chat butonunun rengi, menü metin rengini kullanacak
-            'backgroundColor': 'transparent',
-            'border': 'none',
-            'color': menu_color,
-            'boxShadow': 'none'
+                                'color': menu_color, 'display': 'flex', 'flexDirection': 'column'}
+        hr_style = {'borderColor': hr_color, 'margin': '15px 0'}
+        new_chat_button_style = {
+            'backgroundColor': 'transparent', 'border': 'none', 'color': menu_color,
+            'boxShadow': 'none', 'marginBottom': '10px', 'display': 'flex',
+            'alignItems': 'center', 'textDecoration': 'none', 'textAlign': 'left',
+            'width': '100%', 'padding': '10px 15px', 'borderRadius': '16px', 'fontWeight': '500',
         }
         offcanvas_menu_bottom_style = {
             'position': 'absolute', 'bottom': '0', 'left': '0', 'width': '100%',
             'padding': '10px 20px', 'backgroundColor': menu_bg,
-            'color': link_color,  # Alt linklerin rengi buradan miras alınacak
-            'borderTop': f'1px solid {menu_border}'
+            'borderTop': f'1px solid {menu_border}',
+            'color': link_color,
         }
-        # İkon Buton Stilleri
-        base_icon_button_style = {  # Ortak stil
+        base_icon_button_style = {
             'background': 'none', 'border': 'none', 'cursor': 'pointer',
-            'padding': '5px', 'fontSize': '1.5em',
-            'lineHeight': '1', 'textDecoration': 'none',  # Logout linki için textDecoration eklendi
-            'color': icon_button_color  # İkon rengini temadan al
+            'padding': '5px', 'fontSize': '1.2em',
+            'lineHeight': '1', 'color': icon_button_color
         }
         toggle_offcanvas_button_style = {**base_icon_button_style, 'marginRight': '10px', 'fontSize': '1.5em'}
         dark_mode_button_style = {**base_icon_button_style, 'fontSize': '1.2em'}
         attach_file_button_style = {**base_icon_button_style, 'fontSize': '1.2em', 'marginLeft': '5px'}
-        # Logout Link Stili - base_icon_button_style'ı kullanıyor
-        logout_link_style = {**base_icon_button_style, 'marginLeft': '15px',
-                             'fontSize': '1.2em'}  # Margin ve boyutu ayarla
+        logout_button_style = {**base_icon_button_style, 'marginLeft': '15px', 'fontSize': '1.2em'}
 
-        # Gönder Buton Stili
         send_button_style = {
             'padding': '8px 12px', 'borderRadius': '20px', 'border': 'none',
             'cursor': 'pointer', 'marginLeft': '10px', 'fontSize': '1em',
             'lineHeight': '1', 'backgroundColor': send_button_bg, 'color': send_button_color
         }
 
-        # Return sırası Output sırasıyla aynı olmalı
         return (
-            app_container_style,  # 1
-            chat_log_style,  # 2
-            offcanvas_menu_style,  # 3
-            new_chat_button_style,  # 4
-            offcanvas_menu_bottom_style,  # 5
-            content_area_style,  # 6
-            user_input_style,  # 7
-            top_bar_style,  # 8
-            input_area_style,  # 9
-            toggle_offcanvas_button_style,  # 10
-            dark_mode_button_style,  # 11
-            send_button_style,  # 12
-            attach_file_button_style,  # 13
-            hr_style,  # 14
-            logout_link_style  # 15
+            app_container_style, chat_log_style, offcanvas_menu_style,
+            new_chat_button_style,
+            offcanvas_menu_bottom_style, content_area_style,
+            user_input_style, top_bar_style, input_area_style,
+            toggle_offcanvas_button_style, dark_mode_button_style, send_button_style,
+            attach_file_button_style, hr_style, logout_button_style
         )
 
     # --- Chat Mesajlarını Gösterme Callback'i ---
@@ -472,8 +447,6 @@ def ChatLmmView(request):
         if not user_input or user_input.strip() == "":
             raise PreventUpdate
 
-        print(f"DEBUG: Kullanıcı girdisi alındı: {user_input}")
-
         # --- LangChain Setup ve Çalıştırma (RunnableWithMessageHistory ile) ---
         try:
             # LLM modelini başlat
@@ -507,11 +480,11 @@ def ChatLmmView(request):
                 input_messages_key="input",  # Prompt'unuzdaki kullanıcı girdisi değişkeni
                 history_messages_key="chat_history",  # Prompt'unuzdaki geçmiş değişkeni
             )
-            print("DEBUG: LangChain runnable zinciri başarıyla oluşturuldu.")
+
 
         except Exception as e:
-            print(f"Hata: LangChain zinciri veya history setup oluşturulamadı - {e}")
-            error_message = f"Bot başlatılırken bir hata oluştu: {e}";
+
+            error_message = f"Bot başlatılırken bir hata oluştu: {e}"
             bot_response = error_message  # Hata mesajını bot yanıtı yap
             # Hata durumunda kullanıcı girdisini ve hata mesajını geçmişe ekle
             updated_history = history_data + [{"sender": "Siz", "text": user_input},
@@ -562,6 +535,15 @@ def ChatLmmView(request):
     # Bu kısım Dash'in başlatıldığı yere ve js dosyanızın nasıl yüklendiğine bağlıdır.
     # Şu anki yapıda doğrudan view içinde tanımlamak uygun olmayabilir, bu sadece bir hatırlatma.
 
+    app.clientside_callback(
+        ClientsideFunction(
+            namespace='clientside',  # static/js/clientside.js içinde tanımlı namespace
+            function_name='submitLogoutForm'  # static/js/clientside.js içindeki fonksiyon adı
+        ),
+        Output('logout-button-trigger', 'n_clicks'),  # <-- Output olarak butonun kendi n_clicks'i
+        [Input('logout-button-trigger', 'n_clicks')],  # <-- Input olarak butonun n_clicks'i (Liste içinde!)
+        prevent_initial_call=True  # Clientside callback argümanı
+    )
+
     # Django template'ini render et (Bu template içinde {% plotly_app name='ChatLLM' %} olmalı)
     return render(request, 'llm.html')
-

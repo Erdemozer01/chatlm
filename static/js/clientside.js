@@ -1,23 +1,26 @@
 // static/js/clientside.js
 
+// Dash Clientside Callback'lerinin kullanacağı namespace.
+// window.dash_clientside.clientside namespace'ini tanımlıyoruz.
+// Object.assign, mevcut window.dash_clientside objesini bozmadan yeni fonksiyonları eklemek için kullanılır.
 window.dash_clientside = Object.assign({}, window.dash_clientside, {
-    clientside: {
+    clientside: { // <-- clientside namespace'i
+
         /**
          * Menü açma/kapama sınıfını ve server tarafındaki offcanvas-open store'unu günceller.
          * @param {number} n_clicks - Butonun tıklanma sayısı.
          * @param {string} current_classes - Menü elementinin mevcut sınıfları.
          * @returns {Array<string|boolean>} [Yeni sınıf listesi, Yeni offcanvas-open store değeri]
          */
-        toggle_offcanvas_class: function(n_clicks, current_classes) {
+        toggle_offcanvas_class: function (n_clicks, current_classes) {
             // İlk yüklemede (n_clicks=0) veya null olduğunda hiçbir şey yapma
             if (n_clicks === 0 || n_clicks === null) {
-                // Dash.no_update tarayıcıda tanımsız olabilir, yerine throw exception kullan
                 throw window.Dash.PreventUpdate; // Doğru kullanımı bu
             }
 
             let classesList = current_classes ? current_classes.split(' ') : [];
             let is_open = classesList.includes('menu-open');
-            let new_state = !is_open; // Durumu ters çevir (açıksa kapat, kapalıysa aç)
+            let new_state = !is_open; // Durumu ters çevir
 
             let new_classesList = classesList.filter(cls => cls !== 'menu-open'); // menu-open sınıfını kaldır
             if (new_state) {
@@ -26,28 +29,35 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
 
             let new_classes = new_classesList.join(' '); // Yeni sınıf listesini string yap
 
-            // Server tarafındaki offcanvas-open-server-state store'unu da güncellemek için yeni durumu döndür
-            // Bu, server tarafındaki stil callback'inin (margin-left için) doğru durumu bilmesini sağlar.
+            // Server tarafındaki offcanvas-open-server-state store'unu güncellemek için yeni durumu döndür
             return [new_classes, new_state];
-        }
-    }
-});
+        },
 
-// static/js/clientside.js
+        // --- LOGOUT FORMU SUBMIT ETME FONKSİYONU ---
+        // llm/views.py'deki Clientside Callback tarafından çağrılacak.
+        submitLogoutForm: function(n_clicks) { // <-- submitLogoutForm fonksiyonu, clientside namespace'i içinde
+            // Sadece butona gerçekten tıklandığında (n_clicks 0'dan büyük olunca) çalıştır.
+            if (n_clicks > 0) {
+                // llm.html'deki gizli formu ID'si ile bul.
+                var form = document.getElementById('logout-form');
+                // Console'a formun bulunup bulunmadığını yazdır (hata ayıklama için faydalı)
+                console.log("Logout form araniyor:", form);
 
-window.clientside = { // Callback'te belirtilen namespace
-    submitLogoutForm: function(n_clicks) { // Callback'te belirtilen fonksiyon adı ve inputlar
-        // n_clicks değeri burada kullanılıyor ama fonksiyona tıklama dışı bir input gelmez
-        if (n_clicks > 0) {
-            var form = document.getElementById('logout-form'); // llm.html'deki gizli formun ID'si
-            if (form) {
-                form.submit(); // Formu submit et, bu POST isteği gönderir ve Django logout'u tetikler
-                console.log("Logout formu submit edildi.");
-            } else {
-                console.error("Logout formu bulunamadı!");
+                // Eğer form bulunduysa
+                if (form) {
+                    form.submit(); // Formu submit et - bu POST isteği gönderir.
+                    console.log("Logout formu submit edildi.");
+                    // Form submit edildikten sonra tarayıcı sayfayı yeniden yükleyecektir (Django'nun yönlendirmesiyle).
+                } else {
+                    // Form bulunamazsa konsola hata yaz.
+                    console.error("Hata: 'logout-form' ID'li HTML formu bulunamadı!");
+                }
             }
+            // Dash callback yapısı gereği bir değer dönmelidir (Output'u güncellemek için).
+            // Logout butonu n_clicks sayacını sıfırlıyoruz.
+            return 0;
         }
-        return 0; // Dash callback'e geri dönen değer (logout-button'ın n_clicks'ini sıfırlar)
-    }
-    // ... Diğer clientside fonksiyonlarınız (örn. scroll to bottom) buraya eklenebilir
-};
+        // --- DİĞER CLIENTSIDE FONKSİYONLARI BURAYA EKLENİR ---
+
+    } // <-- clientside namespace'i sonu
+}); // <-- window.dash_clientside objesi tanımı sonu

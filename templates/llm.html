@@ -1,5 +1,5 @@
 <!doctype html>
-{% load static plotly_dash django_bootstrap5 %}
+{% load static plotly_dash django_bootstrap5 %} {# Kullandığınız tag'leri yükleyin #}
 
 <html lang="tr">
 
@@ -8,39 +8,61 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    {# Açıklamalarınız ve yazar bilgileri #}
     <meta name="description"
           content="Pamukkale Üniversitesi, Machine Learning, Data Science, Software Engineering Student Researcher PhD Researcher Cyber Security Student Veri Bilimi Example Project Student Researcher Algoritms "/>
     <meta name="author" content="PhD. Mehmet Erdem ÖZER">
     <meta name="email" content="mozer232@posta.pau.edu.tr, ozer246@gmail.com">
 
+    {# Favicon ve ikonlar - Yollarınızın ve formatlarınızın doğru olduğunu kontrol edin #}
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}">
+    {# Genellikle favicon .ico veya .png formatında doğrudan bağlanır, yolunuzu kontrol edin #}
     <link rel="icon" href="{% static 'images/1744819686631.jpg' %}">
     <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/android-chrome-192x192.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static "images/favicon-32x32.png" %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static "images/favicon-16x16.png" %}">
 
-    <link rel="canonical" href="{% static "images/android-chrome-512x512.png" %}">
-
+    {# Canonical URL genellikle sayfanın ana URL'ini gösterir, bir görseli değil. Bu satırı gözden geçirebilirsiniz. #}
+    {# <link rel="canonical" href="{% static "images/android-chrome-512x512.png" %}"> #}
 
 
     <title> ChatwithLMM </title>
 
-
+    {# django-plotly-dash tarafından sağlanan Dash header için gerekli CSS ve JS dosyaları #}
     {% plotly_header %}
+
+    {# Eğer static/css/style.css dosyanızı llm/views.py'deki external_stylesheets içine eklemediyseniz, #}
+    {# buradan da bağlayabilirsiniz: #}
+    {# <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"> #}
 
 </head>
 <body>
 
-
 <main>
-
+    {# Burası Dash uygulamasının HTML içeriğinin render edileceği yer. #}
+    {# llm/views.py'deki DjangoDash(name='ChatLLM') ile aynı isim kullanılmalı. #}
     {% plotly_direct name="ChatLLM" %}
-
 </main>
 
+{# --- LOGOUT FORMU EKLENİYOR --- #}
+{# Bu form gizli olacak (display: none) ve Dash butonuyla (Clientside JS aracılığıyla) tetiklenecek. #}
+{# action="/logout/" veya {% url 'logout' %} şeklinde Django'daki logout URL'ine işaret etmeli. #}
+{# method="post" olarak ayarlandı ve güvenlik için CSRF token içeriyor. #}
+<form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+    {% csrf_token %} {# Django'nun POST istekleri için istediği güvenlik token'ı. ZORUNLUDUR. #}
+    {# Formun içinde bir submit butonu olabilir ama gizli olduğu için görünmemesi sorun değil #}
+    <button type="submit">Logout</button>
+</form>
+{# --- LOGOUT FORMU SONU --- #}
+
+
+{# django-plotly-dash tarafından sağlanan Dash footer için gerekli JS dosyaları #}
 {% plotly_footer %}
+
+{# Clientside JavaScript dosyasını yükleyin. Form ve plotly_footer'dan sonra yüklenmesi önemlidir. #}
+{# Kendi static dizin yapınıza göre yolu ayarlayın. #}
+<script src="{% static 'js/clientside.js' %}"></script>
 
 
 </body>
 </html>
-
