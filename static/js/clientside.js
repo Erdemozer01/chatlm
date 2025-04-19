@@ -4,7 +4,11 @@
 // window.dash_clientside.clientside namespace'ini tanımlıyoruz.
 // Object.assign, mevcut window.dash_clientside objesini bozmadan yeni fonksiyonları eklemek için kullanılır.
 window.dash_clientside = Object.assign({}, window.dash_clientside, {
+
+
+
     clientside: { // <-- clientside namespace'i
+
 
         /**
          * Menü açma/kapama sınıfını ve server tarafındaki offcanvas-open store'unu günceller.
@@ -59,5 +63,8 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
         }
         // --- DİĞER CLIENTSIDE FONKSİYONLARI BURAYA EKLENİR ---
 
+
+
     } // <-- clientside namespace'i sonu
 }); // <-- window.dash_clientside objesi tanımı sonu
+
