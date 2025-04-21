@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-k-8i&q82&jz3(h@u+lndw1%l#gv1p2cu3j&^mxogyn&7(4d^!w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["chatllm.pythonanywhere.com", "localhost", "127.0.0.1"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
