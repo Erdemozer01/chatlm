@@ -72,7 +72,10 @@ app = DjangoDash(
     name='ChatLLM',
     external_stylesheets=[dbc.themes.BOOTSTRAP, external_style, custom_css],
     external_scripts=[custom_js],
-    suppress_callback_exceptions=True
+    suppress_callback_exceptions=True,
+    meta_tags=[
+        {"name": "viewport", "content": "width=device-width, initial-scale=1.0"}
+    ]
 )
 
 
@@ -225,18 +228,18 @@ def create_image_preview_bubble(base64_image_url, filename, theme):
     }
     container_style = {
         'overflow': 'auto', 'marginBottom': '10px', 'paddingLeft': '5px', 'paddingRight': '5px',
-        'textAlign': 'right' # Kullanıcı mesajı hizalaması
+        'textAlign': 'right'  # Kullanıcı mesajı hizalaması
     }
 
     # Tema renklerini kullanıcı balonu için uygula
     bubble_style['backgroundColor'] = '#007bff' if theme == 'light' else '#0d6efd'
-    bubble_style['color'] = 'white' # Yazı rengi (resim balonunda metin olmayabilir ama stil gereği)
+    bubble_style['color'] = 'white'  # Yazı rengi (resim balonunda metin olmayabilir ama stil gereği)
 
     # Resim elementini oluştur
     image_element = html.Img(src=base64_image_url, style={
-        'maxWidth': '100%', # Baloncuğun genişliğini aşmasın
-        'height': 'auto', # Orantısını koru
-        'marginTop': '0px', # Sadece resim varsa üstünde boşluk olmasın
+        'maxWidth': '100%',  # Baloncuğun genişliğini aşmasın
+        'height': 'auto',  # Orantısını koru
+        'marginTop': '0px',  # Sadece resim varsa üstünde boşluk olmasın
     })
 
     # Resim altına dosya adı veya bir başlık eklemek isterseniz:
@@ -248,9 +251,10 @@ def create_image_preview_bubble(base64_image_url, filename, theme):
 
     # Baloncuk div'i ve konteyner div'i oluştur
     bubble_div = html.Div(message_content_element, style=bubble_style)
-    container_div = html.Div(bubble_div, style=container_style) # Konteyner hizalamayı sağlar
+    container_div = html.Div(bubble_div, style=container_style)  # Konteyner hizalamayı sağlar
 
-    return container_div # Oluşturulan baloncuk konteyneri elementini döndür
+    return container_div  # Oluşturulan baloncuk konteyneri elementini döndür
+
 
 # --- Fonksiyon Sonu ---
 
@@ -347,7 +351,7 @@ def update_styles(theme, is_offcanvas_open):
     if theme == 'dark':
         app_bg = '#212529'
         app_color = '#f8f9fa'
-        chat_bg = '#343a40';
+        chat_bg = '#343a40'
         chat_border = '#495057'
         input_bg = '#495057'
         input_color = '#f8f9fa'
@@ -392,13 +396,40 @@ def update_styles(theme, is_offcanvas_open):
     offcanvas_left = '0px' if is_offcanvas_open else '-250px'
     content_margin_left = '250px' if is_offcanvas_open else '0px'
 
-    app_container_style = {'display': 'flex', 'height': '100vh', 'fontFamily': 'Segoe UI, sans-serif',
-                           'backgroundColor': app_bg, 'color': app_color, 'overflow': 'hidden'}
-    chat_log_style = {'flexGrow': 1, 'overflowY': 'auto', 'padding': '15px', 'backgroundColor': chat_bg,
-                      'borderTop': f'1px solid {chat_border}', 'borderBottom': f'1px solid {chat_border}'}
-    content_area_style = {'flexGrow': 1, 'display': 'flex', 'flexDirection': 'column', 'height': '100vh',
-                          'marginLeft': content_margin_left, 'transition': 'margin-left 0.3s ease-in-out',
-                          'backgroundColor': app_bg}
+    # Responsive tasarım için temel değişkenler
+    offcanvas_width = '250px'
+    offcanvas_width_small = '80%'  # Küçük ekranlarda menü genişliği
+
+    app_container_style = {
+        'display': 'flex',
+        'height': '100vh',
+        'fontFamily': 'Segoe UI, sans-serif',
+        'backgroundColor': app_bg,
+        'color': app_color,
+        'overflow': 'hidden',
+        'position': 'relative'  # Pozisyon değişikliği
+    }
+    chat_log_style = {
+        'flexGrow': 1,
+        'overflowY': 'auto',
+        'padding': '15px',
+        'backgroundColor': chat_bg,
+        'borderTop': f'1px solid {chat_border}',
+        'borderBottom': f'1px solid {chat_border}',
+        'wordBreak': 'break-word'  # Uzun metinlerin taşmasını önler
+    }
+
+    content_area_style = {
+        'flexGrow': 1,
+        'display': 'flex',
+        'flexDirection': 'column',
+        'height': '100vh',
+        'marginLeft': content_margin_left,
+        'transition': 'margin-left 0.3s ease-in-out',
+        'backgroundColor': app_bg,
+        'width': '100%',  # Tam genişlik
+        'maxWidth': '100%'  # Maksimum genişlik sınırı
+    }
     # --- USER INPUT AREA STYLE (dcc.Textarea için ayarlandı) ---
     user_input_style = {
         'flexGrow': 1,
@@ -408,55 +439,156 @@ def update_styles(theme, is_offcanvas_open):
         'border': f'1px solid {border_color}',
         'backgroundColor': input_bg,
         'color': input_color,
-        'minHeight': '80px',  # Minimum yükseklik (istenirse ayarlanabilir)
-        'resize': 'vertical',  # <-- Yüksekliği kullanıcı tarafından ayarlanabilir yap
+        'minHeight': '50px',  # Daha küçük minimum yükseklik
+        'maxHeight': '150px',  # Maksimum yükseklik sınırı
+        'resize': 'vertical',
         'boxSizing': 'border-box',
         'lineHeight': '1.4',
         'width': '100%',
+        'fontSize': '0.95rem'  # Daha küçük font size
     }
     # --- End USER INPUT AREA STYLE ---
 
-    top_bar_style = {'padding': '10px 15px', 'backgroundColor': top_bar_bg,
-                     'borderBottom': f'1px solid {top_bar_border}', 'display': 'flex', 'alignItems': 'center',
-                     'justifyContent': 'space-between', 'color': app_color}
-    input_area_style = {'padding': '15px', 'display': 'flex', 'alignItems': 'center',
-                        'borderTop': f'1px solid {input_area_border}', 'backgroundColor': input_area_bg}
-    offcanvas_menu_style = {'width': '250px', 'backgroundColor': menu_bg, 'borderRight': f'1px solid {menu_border}',
-                            'padding': '20px', 'position': 'fixed', 'top': 0, 'left': offcanvas_left, 'bottom': 0,
-                            'zIndex': 1050, 'transition': 'left 0.3s ease-in-out', 'overflowY': 'auto',
-                            'color': menu_color, 'display': 'flex', 'flexDirection': 'column'}
-    hr_style = {'borderColor': hr_color, 'margin': '15px 0'}
+    top_bar_style = {
+        'padding': '10px',
+        'backgroundColor': top_bar_bg,
+        'borderBottom': f'1px solid {top_bar_border}',
+        'display': 'flex',
+        'alignItems': 'center',
+        'justifyContent': 'space-between',
+        'color': app_color,
+        'flexWrap': 'wrap',  # Küçük ekranlarda sarma
+        'minHeight': '60px'  # Minimum yükseklik
+    }
+
+    # Input alanı için responsive stil
+    input_area_style = {
+        'padding': '10px',  # Daha az padding
+        'display': 'flex',
+        'alignItems': 'center',
+        'borderTop': f'1px solid {input_area_border}',
+        'backgroundColor': input_area_bg,
+        'flexWrap': 'nowrap',  # Sarma yok
+        'position': 'relative',  # Pozisyon ayarı
+        'gap': '5px'  # Elementler arası boşluk
+    }
+
+    # Offcanvas menü için responsive stil
+    offcanvas_menu_style = {
+        'width': offcanvas_width,
+        'backgroundColor': menu_bg,
+        'borderRight': f'1px solid {menu_border}',
+        'padding': '20px',
+        'position': 'fixed',
+        'top': 0,
+        'left': offcanvas_left,
+        'bottom': 0,
+        'zIndex': 1050,
+        'transition': 'left 0.3s ease-in-out',
+        'overflowY': 'auto',
+        'color': menu_color,
+        'display': 'flex',
+        'flexDirection': 'column',
+        'boxShadow': '2px 0 10px rgba(0,0,0,0.1)',  # Gölge ekle
+        # Küçük ekranlarda genişliği ayarla
+        'media_query': {
+            'width': offcanvas_width_small
+        }
+    }
+
+    hr_style = {
+        'borderColor': hr_color,
+        'margin': '15px 0',
+        'width': '100%'  # Tam genişlik
+    }
 
     new_chat_button_style = {
-        'marginBottom': '10px', 'display': 'flex', 'alignItems': 'center',
-        'textDecoration': 'none', 'textAlign': 'left', 'width': '100%',
-        'padding': '10px 15px', 'borderRadius': '16px', 'fontWeight': '500',
-        'border': 'none', 'boxShadow': 'none',
+        'marginBottom': '10px',
+        'display': 'flex',
+        'alignItems': 'center',
+        'textDecoration': 'none',
+        'textAlign': 'left',
+        'width': '100%',
+        'padding': '10px 15px',
+        'borderRadius': '16px',
+        'fontWeight': '500',
+        'border': 'none',
+        'boxShadow': 'none',
         'backgroundColor': menu_button_bg,
         'color': menu_button_color,
+        'fontSize': '0.9rem'  # Daha küçük font
     }
 
     offcanvas_menu_bottom_style = {
-        'position': 'absolute', 'bottom': '0', 'left': '0', 'width': '100%',
-        'padding': '10px 20px', 'backgroundColor': menu_bg,
+        'position': 'absolute',
+        'bottom': '0',
+        'left': '0',
+        'width': '100%',
+        'padding': '10px 20px',
+        'backgroundColor': menu_bg,
         'borderTop': f'1px solid {menu_border}',
         'color': link_color,
+        'zIndex': 1  # z-index ekle
     }
 
     base_icon_button_style = {
-        'background': 'none', 'border': 'none', 'cursor': 'pointer',
-        'padding': '5px', 'fontSize': '1.2em',
-        'lineHeight': '1', 'color': icon_button_color
+        'background': 'none',
+        'border': 'none',
+        'cursor': 'pointer',
+        'padding': '8px',  # Daha büyük tıklama alanı
+        'fontSize': '1.2em',
+        'lineHeight': '1',
+        'color': icon_button_color,
+        'borderRadius': '50%',  # Yuvarlak butonlar
+        'display': 'flex',
+        'alignItems': 'center',
+        'justifyContent': 'center',
+        'minWidth': '36px',  # Minimum genişlik
+        'minHeight': '36px',  # Minimum yükseklik
+        'transition': 'background-color 0.2s'  # Hover efekti için geçiş
     }
-    toggle_offcanvas_button_style = {**base_icon_button_style, 'marginRight': '10px', 'fontSize': '1.5em'}
-    dark_mode_button_style = {**base_icon_button_style, 'fontSize': '1.2em'}
-    attach_file_button_style = {**base_icon_button_style, 'fontSize': '1.2em', 'marginLeft': '5px'}
-    logout_button_style = {**base_icon_button_style, 'marginLeft': '15px', 'fontSize': '1.2em'}
+
+    toggle_offcanvas_button_style = {
+        **base_icon_button_style,
+        'marginRight': '10px',
+        'fontSize': '1.5em',
+        'zIndex': 2  # Üstte kalması için z-index
+    }
+
+    dark_mode_button_style = {
+        **base_icon_button_style,
+        'fontSize': '1.2em',
+        'marginLeft': '5px'  # Biraz boşluk ekle
+    }
+
+    attach_file_button_style = {
+        **base_icon_button_style,
+        'fontSize': '1.2em',
+        'marginLeft': '5px'
+    }
+
+    logout_button_style = {
+        **base_icon_button_style,
+        'marginLeft': '10px',
+        'fontSize': '1.2em'
+    }
 
     send_button_style = {
-        'padding': '8px 12px', 'borderRadius': '20px', 'border': 'none',
-        'cursor': 'pointer', 'marginLeft': '10px', 'fontSize': '1em',
-        'lineHeight': '1', 'backgroundColor': send_button_bg, 'color': send_button_color
+        'padding': '8px 12px',
+        'borderRadius': '20px',
+        'border': 'none',
+        'cursor': 'pointer',
+        'marginLeft': '5px',  # Azaltılmış margin
+        'fontSize': '1em',
+        'lineHeight': '1',
+        'backgroundColor': send_button_bg,
+        'color': send_button_color,
+        'display': 'flex',
+        'alignItems': 'center',
+        'justifyContent': 'center',
+        'minWidth': '36px',  # Minimum genişlik
+        'minHeight': '36px',  # Minimum yükseklik
+        'boxShadow': '0 2px 5px rgba(0,0,0,0.1)'  # Hafif gölge
     }
 
     # Return all style dictionaries
@@ -464,74 +596,77 @@ def update_styles(theme, is_offcanvas_open):
         app_container_style, chat_log_style, offcanvas_menu_style,
         new_chat_button_style,
         offcanvas_menu_bottom_style, content_area_style,
-        user_input_style,  # <-- user_input_style döndürülüyor
+        user_input_style,
         top_bar_style, input_area_style,
         toggle_offcanvas_button_style, dark_mode_button_style, send_button_style,
         attach_file_button_style, hr_style, logout_button_style
     )
+
 
 # llm/views.py dosyasında, önceki add_welcome_message_on_load ve update_chat_log callback'lerinin yerine gelecek
 
 # --- CALLBACK: Chat Log'u Çizme ve Karşılama Mesajı Ekleme ---
 # Bu callback hem mesajları çizer hem de ilk yüklendiğinde karşılama mesajını ekler.
 @app.callback(
-    Output('chat-log', 'children'), # 1. Çıktı: Sohbet baloncuklarının listesi
-    Output('chat-history', 'data', allow_duplicate=True), # 2. Çıktı: chat-history store'unu güncelle (Karşılama mesajını eklemek için)
-    Input('chat-history', 'data'), # Tetikleyici: chat-history data değiştiğinde (ilk yükleme dahil)
-    State('theme-store', 'data'), # State: Mevcut tema bilgisini al
-    State('username-store', 'data'), # State: Kullanıcı adını al
+    Output('chat-log', 'children'),  # 1. Çıktı: Sohbet baloncuklarının listesi
+    Output('chat-history', 'data', allow_duplicate=True),
+    # 2. Çıktı: chat-history store'unu güncelle (Karşılama mesajını eklemek için)
+    Input('chat-history', 'data'),  # Tetikleyici: chat-history data değiştiğinde (ilk yükleme dahil)
+    State('theme-store', 'data'),  # State: Mevcut tema bilgisini al
+    State('username-store', 'data'),  # State: Kullanıcı adını al
 
-    prevent_initial_call='initial_duplicate' # İlk yüklemede de çalışmasına izin ver
+    prevent_initial_call='initial_duplicate'  # İlk yüklemede de çalışmasına izin ver
 )
 def render_chat_log_with_welcome(history_data, theme, username):
-   # Debug print statements
-   print("DEBUG: >>> render_chat_log_with_welcome callback tetiklendi <<<")
-   print(f"DEBUG: >>> render_chat_log_with_welcome received history_data (length {len(history_data) if history_data is not None else 'None'}): {history_data[:5] if history_data is not None else 'None'}{'...' if history_data is not None and len(history_data) > 5 else ''} <<<")
-   print(f"DEBUG: >>> render_chat_log_with_welcome received username: {username} <<<")
+    # Debug print statements
+    print("DEBUG: >>> render_chat_log_with_welcome callback tetiklendi <<<")
+    print(
+        f"DEBUG: >>> render_chat_log_with_welcome received history_data (length {len(history_data) if history_data is not None else 'None'}): {history_data[:5] if history_data is not None else 'None'}{'...' if history_data is not None and len(history_data) > 5 else ''} <<<")
+    print(f"DEBUG: >>> render_chat_log_with_welcome received username: {username} <<<")
 
-   # Karşılama mesajının yapısını tanımla
-   welcome_text = "Merhaba! Size nasıl yardımcı olabilirim? Ben bir yapay zeka asistanıyım."
-   if username:
-       welcome_text = f"Merhaba, {username}! Size nasıl yardımcı olabilirim? Ben bir yapay zeka asistanıyım."
-   welcome_message_item = {"sender": "Bot", "text": welcome_text, "image_url": None}
+    # Karşılama mesajının yapısını tanımla
+    welcome_text = "Merhaba! Size nasıl yardımcı olabilirim? Ben bir yapay zeka asistanıyım."
+    if username:
+        welcome_text = f"Merhaba, {username}! Size nasıl yardımcı olabilirim? Ben bir yapay zeka asistanıyım."
+    welcome_message_item = {"sender": "Bot", "text": welcome_text, "image_url": None}
 
-   # Check if history data is None or empty OR if the first message is NOT the welcome message
-   history_is_empty_or_none = history_data is None or len(history_data) == 0
-   first_message_is_not_welcome = True # Varsayılan olarak ilk mesaj karşılama mesajı değil
+    # Check if history data is None or empty OR if the first message is NOT the welcome message
+    history_is_empty_or_none = history_data is None or len(history_data) == 0
+    first_message_is_not_welcome = True  # Varsayılan olarak ilk mesaj karşılama mesajı değil
 
-   if not history_is_empty_or_none:
-       if isinstance(history_data, list) and len(history_data) > 0:
-           first_message = history_data[0]
-           if isinstance(first_message, dict) and \
-              first_message.get("sender") == welcome_message_item["sender"] and \
-              first_message.get("text") == welcome_message_item["text"] and \
-              first_message.get("image_url") == welcome_message_item["image_url"]:
-               first_message_is_not_welcome = False
+    if not history_is_empty_or_none:
+        if isinstance(history_data, list) and len(history_data) > 0:
+            first_message = history_data[0]
+            if isinstance(first_message, dict) and \
+                    first_message.get("sender") == welcome_message_item["sender"] and \
+                    first_message.get("text") == welcome_message_item["text"] and \
+                    first_message.get("image_url") == welcome_message_item["image_url"]:
+                first_message_is_not_welcome = False
 
-   updated_history = history_data # Başlangıçta alınan history_data ile başla
+    updated_history = history_data  # Başlangıçta alınan history_data ile başla
 
-   # Eğer geçmiş boşsa VEYA (geçmiş boş değilse AMA ilk mesaj karşılama mesajı değilse)
-   # karşılama mesajını eklememiz gerekiyor (veya en başa almamız).
-   if history_is_empty_or_none or first_message_is_not_welcome:
-       print("DEBUG: render_chat_log_with_welcome: Gecmis bos/None veya ilk mesaj karsilama degil, karsilama mesaji ekleniyor.")
-       # Yeni geçmiş listesi oluştur: Karşılama mesajıyla başla
-       if history_is_empty_or_none:
-           updated_history = [welcome_message_item] # Sadece karşılama mesajı içeren liste
-       else:
+    # Eğer geçmiş boşsa VEYA (geçmiş boş değilse AMA ilk mesaj karşılama mesajı değilse)
+    # karşılama mesajını eklememiz gerekiyor (veya en başa almamız).
+    if history_is_empty_or_none or first_message_is_not_welcome:
+        print(
+            "DEBUG: render_chat_log_with_welcome: Gecmis bos/None veya ilk mesaj karsilama degil, karsilama mesaji ekleniyor.")
+        # Yeni geçmiş listesi oluştur: Karşılama mesajıyla başla
+        if history_is_empty_or_none:
+            updated_history = [welcome_message_item]  # Sadece karşılama mesajı içeren liste
+        else:
             # Karşılama mesajını mevcut geçmişin başına ekle
             # Eğer history_data None ise, bunu [] olarak varsay ve karşılama mesajını ekle
             current_history_list = history_data if history_data is not None else []
             updated_history = [welcome_message_item] + current_history_list
 
+        print("DEBUG: render_chat_log_with_welcome: Karsilama mesaji ile guncellenmis gecmis donduruluyor.")
+        # Hem oluşturulan/güncellenen baloncukları döndür (aşağıda çizilecek) HEM de güncellenmiş geçmişi Store'a yaz
+        # Çıktı 1: chat-log children (render edilecek baloncuklar)
+        # Çıktı 2: chat-history data (güncellenmiş geçmiş)
+        chat_messages = []  # Render edilecek baloncuklar
 
-       print("DEBUG: render_chat_log_with_welcome: Karsilama mesaji ile guncellenmis gecmis donduruluyor.")
-       # Hem oluşturulan/güncellenen baloncukları döndür (aşağıda çizilecek) HEM de güncellenmiş geçmişi Store'a yaz
-       # Çıktı 1: chat-log children (render edilecek baloncuklar)
-       # Çıktı 2: chat-history data (güncellenmiş geçmiş)
-       chat_messages = [] # Render edilecek baloncuklar
-
-       # Güncellenmiş history'yi çizmeye devam et
-       if updated_history is not None: # Güncellenmiş history None olmamalı, ama güvenlik için
+        # Güncellenmiş history'yi çizmeye devam et
+        if updated_history is not None:  # Güncellenmiş history None olmamalı, ama güvenlik için
             print("DEBUG: Proceeding to build chat bubbles from updated_history (welcome added).")
             # ... Geri kalan baloncuk oluşturma döngüsü ve return chat_messages (updated_history kullanarak) ...
             for msg_data in updated_history:
@@ -541,10 +676,13 @@ def render_chat_log_with_welcome(history_data, theme, username):
                 timestamp_str = msg_data.get("timestamp")
 
                 if not sender or (not text and not image_url and not timestamp_str):
-                     continue
+                    continue
 
-                bubble_style = { 'padding': '10px 15px', 'borderRadius': '15px', 'marginBottom': '0px', 'maxWidth': '85%', 'wordWrap': 'break-word', 'display': 'inline-block', 'textAlign': 'left', 'fontSize': '0.95em' }
-                container_style = { 'overflow': 'auto', 'marginBottom': '10px', 'paddingLeft': '5px', 'paddingRight': '5px' }
+                bubble_style = {'padding': '10px 15px', 'borderRadius': '15px', 'marginBottom': '0px',
+                                'maxWidth': '85%', 'wordWrap': 'break-word', 'display': 'inline-block',
+                                'textAlign': 'left', 'fontSize': '0.95em'}
+                container_style = {'overflow': 'auto', 'marginBottom': '10px', 'paddingLeft': '5px',
+                                   'paddingRight': '5px'}
                 is_user = sender == "Siz"
                 if is_user:
                     bubble_style['backgroundColor'] = '#007bff' if theme == 'light' else '#0d6efd'
@@ -556,77 +694,106 @@ def render_chat_log_with_welcome(history_data, theme, username):
                     container_style['textAlign'] = 'left'
 
                 message_parts = []
-                if text: message_parts.append(dcc.Markdown(text, className='chat-markdown', style={'color': 'inherit', 'fontSize': 'inherit', 'lineHeight': '1.4'}))
-                if image_url: message_parts.append(html.Img(src=image_url, style={'maxWidth': '100%', 'height': 'auto', 'marginTop': '5px' if text else '0px'}))
+                if text: message_parts.append(dcc.Markdown(text, className='chat-markdown',
+                                                           style={'color': 'inherit', 'fontSize': 'inherit',
+                                                                  'lineHeight': '1.4'}))
+                if image_url: message_parts.append(html.Img(src=image_url, style={'maxWidth': '100%', 'height': 'auto',
+                                                                                  'marginTop': '5px' if text else '0px'}))
                 if timestamp_str:
-                    try: timestamp_dt = datetime.datetime.fromisoformat(timestamp_str); formatted_timestamp = timestamp_dt.strftime('%H:%M')
-                    except ValueError: formatted_timestamp = "Geçersiz Zaman"; print(f"ERROR: Failed to parse timestamp string: {timestamp_str}")
-                    timestamp_element = html.Div(formatted_timestamp, style={'fontSize': '0.7em', 'color': '#888', 'marginTop': '5px', 'textAlign': 'right' if is_user else 'left',})
+                    try:
+                        timestamp_dt = datetime.datetime.fromisoformat(
+                            timestamp_str); formatted_timestamp = timestamp_dt.strftime('%H:%M')
+                    except ValueError:
+                        formatted_timestamp = "Geçersiz Zaman"; print(
+                            f"ERROR: Failed to parse timestamp string: {timestamp_str}")
+                    timestamp_element = html.Div(formatted_timestamp,
+                                                 style={'fontSize': '0.7em', 'color': '#888', 'marginTop': '5px',
+                                                        'textAlign': 'right' if is_user else 'left', })
                     message_parts.append(timestamp_element)
 
                 if not message_parts: continue
-                if len(message_parts) > 1: message_content_element = html.Div(message_parts)
-                elif message_parts: message_content_element = message_parts[0]
-                else: continue
+                if len(message_parts) > 1:
+                    message_content_element = html.Div(message_parts)
+                elif message_parts:
+                    message_content_element = message_parts[0]
+                else:
+                    continue
                 bubble_div = html.Div(message_content_element, style=bubble_style)
                 chat_messages.append(html.Div(bubble_div, style=container_style))
                 print("DEBUG: Bubble created and added to chat_messages list.")
 
-       print(f"DEBUG: render_chat_log_with_welcome returning {len(chat_messages)} bubbles and updated history.")
-       # Döndür: Çizilecek baloncuklar listesi VE güncellenmiş geçmiş listesi (Store'a yazılacak)
-       return chat_messages, updated_history # İKİ DEĞER DÖNDÜR
+        print(f"DEBUG: render_chat_log_with_welcome returning {len(chat_messages)} bubbles and updated history.")
+        # Döndür: Çizilecek baloncuklar listesi VE güncellenmiş geçmiş listesi (Store'a yazılacak)
+        return chat_messages, updated_history  # İKİ DEĞER DÖNDÜR
 
-   else:
-       # Geçmiş boş değil VE ilk mesaj karşılama mesajı. Zaten olması gereken durumda.
-       # Sadece mevcut geçmişi çiz. Geçmişi Store'da güncellemeye gerek yok (no_update kullan)
-       print("DEBUG: render_chat_log_with_welcome: Gecmis zaten dolu ve karsilama mesaji basta, sadece ciziliyor.")
-       chat_messages = [] # Render edilecek baloncuklar
+    else:
+        # Geçmiş boş değil VE ilk mesaj karşılama mesajı. Zaten olması gereken durumda.
+        # Sadece mevcut geçmişi çiz. Geçmişi Store'da güncellemeye gerek yok (no_update kullan)
+        print("DEBUG: render_chat_log_with_welcome: Gecmis zaten dolu ve karsilama mesaji basta, sadece ciziliyor.")
+        chat_messages = []  # Render edilecek baloncuklar
 
-       # Mevcut history_data'yı çiz
-       if history_data is not None: # history_data None olmamalı
-            print("DEBUG: Proceeding to build chat bubbles from received history_data (no welcome message added this run).")
+        # Mevcut history_data'yı çiz
+        if history_data is not None:  # history_data None olmamalı
+            print(
+                "DEBUG: Proceeding to build chat bubbles from received history_data (no welcome message added this run).")
             # ... Geri kalan baloncuk oluşturma döngüsü ve return chat_messages (history_data kullanarak) ...
             for msg_data in history_data:
-                 sender = msg_data.get("sender")
-                 text = msg_data.get("text")
-                 image_url = msg_data.get("image_url")
-                 timestamp_str = msg_data.get("timestamp")
+                sender = msg_data.get("sender")
+                text = msg_data.get("text")
+                image_url = msg_data.get("image_url")
+                timestamp_str = msg_data.get("timestamp")
 
-                 if not sender or (not text and not image_url and not timestamp_str):
-                     continue
+                if not sender or (not text and not image_url and not timestamp_str):
+                    continue
 
-                 bubble_style = { 'padding': '10px 15px', 'borderRadius': '15px', 'marginBottom': '0px', 'maxWidth': '85%', 'wordWrap': 'break-word', 'display': 'inline-block', 'textAlign': 'left', 'fontSize': '0.95em' }
-                 container_style = { 'overflow': 'auto', 'marginBottom': '10px', 'paddingLeft': '5px', 'paddingRight': '5px' }
-                 is_user = sender == "Siz"
-                 if is_user:
-                     bubble_style['backgroundColor'] = '#007bff' if theme == 'light' else '#0d6efd'
-                     bubble_style['color'] = 'white'
-                     container_style['textAlign'] = 'right'
-                 else:
-                     bubble_style['backgroundColor'] = '#e9ecef' if theme == 'light' else '#495057'
-                     bubble_style['color'] = '#212529' if theme == 'light' else '#f8f9fa'
-                     container_style['textAlign'] = 'left'
+                bubble_style = {'padding': '10px 15px', 'borderRadius': '15px', 'marginBottom': '0px',
+                                'maxWidth': '85%', 'wordWrap': 'break-word', 'display': 'inline-block',
+                                'textAlign': 'left', 'fontSize': '0.95em'}
+                container_style = {'overflow': 'auto', 'marginBottom': '10px', 'paddingLeft': '5px',
+                                   'paddingRight': '5px'}
+                is_user = sender == "Siz"
+                if is_user:
+                    bubble_style['backgroundColor'] = '#007bff' if theme == 'light' else '#0d6efd'
+                    bubble_style['color'] = 'white'
+                    container_style['textAlign'] = 'right'
+                else:
+                    bubble_style['backgroundColor'] = '#e9ecef' if theme == 'light' else '#495057'
+                    bubble_style['color'] = '#212529' if theme == 'light' else '#f8f9fa'
+                    container_style['textAlign'] = 'left'
 
-                 message_parts = []
-                 if text: message_parts.append(dcc.Markdown(text, className='chat-markdown', style={'color': 'inherit', 'fontSize': 'inherit', 'lineHeight': '1.4'}))
-                 if image_url: message_parts.append(html.Img(src=image_url, style={'maxWidth': '100%', 'height': 'auto', 'marginTop': '5px' if text else '0px'}))
-                 if timestamp_str:
-                     try: timestamp_dt = datetime.datetime.fromisoformat(timestamp_str); formatted_timestamp = timestamp_dt.strftime('%H:%M')
-                     except ValueError: formatted_timestamp = "Geçersiz Zaman"; print(f"ERROR: Failed to parse timestamp string: {timestamp_str}")
-                     timestamp_element = html.Div(formatted_timestamp, style={'fontSize': '0.7em', 'color': '#888', 'marginTop': '5px', 'textAlign': 'right' if is_user else 'left',})
-                     message_parts.append(timestamp_element)
+                message_parts = []
+                if text: message_parts.append(dcc.Markdown(text, className='chat-markdown',
+                                                           style={'color': 'inherit', 'fontSize': 'inherit',
+                                                                  'lineHeight': '1.4'}))
+                if image_url: message_parts.append(html.Img(src=image_url, style={'maxWidth': '100%', 'height': 'auto',
+                                                                                  'marginTop': '5px' if text else '0px'}))
+                if timestamp_str:
+                    try:
+                        timestamp_dt = datetime.datetime.fromisoformat(
+                            timestamp_str); formatted_timestamp = timestamp_dt.strftime('%H:%M')
+                    except ValueError:
+                        formatted_timestamp = "Geçersiz Zaman"; print(
+                            f"ERROR: Failed to parse timestamp string: {timestamp_str}")
+                    timestamp_element = html.Div(formatted_timestamp,
+                                                 style={'fontSize': '0.7em', 'color': '#888', 'marginTop': '5px',
+                                                        'textAlign': 'right' if is_user else 'left', })
+                    message_parts.append(timestamp_element)
 
-                 if not message_parts: continue
-                 if len(message_parts) > 1: message_content_element = html.Div(message_parts)
-                 elif message_parts: message_content_element = message_parts[0]
-                 else: continue
-                 bubble_div = html.Div(message_content_element, style=bubble_style)
-                 chat_messages.append(html.Div(bubble_div, style=container_style))
-                 print("DEBUG: Bubble created and added to chat_messages list.")
+                if not message_parts: continue
+                if len(message_parts) > 1:
+                    message_content_element = html.Div(message_parts)
+                elif message_parts:
+                    message_content_element = message_parts[0]
+                else:
+                    continue
+                bubble_div = html.Div(message_content_element, style=bubble_style)
+                chat_messages.append(html.Div(bubble_div, style=container_style))
+                print("DEBUG: Bubble created and added to chat_messages list.")
 
-       print(f"DEBUG: render_chat_log_with_welcome returning {len(chat_messages)} bubbles and no_update for history.")
-       # Döndür: Çizilecek baloncuklar listesi VE history Store'u için no_update
-       return chat_messages, no_update # İKİ DEĞER DÖNDÜR
+        print(f"DEBUG: render_chat_log_with_welcome returning {len(chat_messages)} bubbles and no_update for history.")
+        # Döndür: Çizilecek baloncuklar listesi VE history Store'u için no_update
+        return chat_messages, no_update  # İKİ DEĞER DÖNDÜR
+
 
 # --- END render_chat_log_with_welcome callback code ---
 
@@ -634,194 +801,166 @@ def render_chat_log_with_welcome(history_data, theme, username):
 # llm/views.py dosyasında, diğer callback fonksiyonlarının altında
 
 # datetime modülünün dosyanın başında import edildiğinden emin olun: import datetime
-# ChatMessageHistory sınıfının dosyanın başında doğru yerden import edildiğinden emin olun: from langchain_community.chat_message_histories import ChatMessageHistory
-
 @app.callback(
-    Output('chat-history', 'data'), # 1. Output: Güncellenmiş sohbet geçmişi
-    Output('user-input', 'value'), # 2. Output: Temizlenmiş kullanıcı girdisi alanı
-    Output('uploaded-image-data', 'data', allow_duplicate=True), # 3. Output: uploaded-image-data store'una None yazarak temizle
-    # --- YENİ ÇIKTI: Resim önizleme alanını temizle ---
-    Output('image-preview-area', 'children', allow_duplicate=True), # <-- 4. Output: Önizleme div çocuklarını temizle
-    # --- YENİ ÇIKTI SONU ---
-
-    Input('user-input', 'n_submit'),  # Input 1: Enter'a basılınca tetiklenir
-    Input('send-button', 'n_clicks'),  # Input 2: Gönder butonuna tıklanınca tetiklenir
-    State('user-input', 'value'),  # State 1: Kullanıcının yazdığı metin
-    State('chat-history', 'data'),  # State 2: Mevcut sohbet geçmişi
-    # --- YENİ STATE: Yüklenen resim verisini al ---
-    State('uploaded-image-data', 'data'),  # State 3: Yüklenmiş resim verisi (Base64 formatında)
-    # --- YENİ STATE SONU ---
-    prevent_initial_call=True  # İlk sayfa yüklemesinde çalışmasını engelle
+    Output('chat-history', 'data'),
+    Output('user-input', 'value'),
+    Output('uploaded-image-data', 'data', allow_duplicate=True),
+    Output('image-preview-area', 'children', allow_duplicate=True),
+    Input('user-input', 'n_submit'),
+    Input('send-button', 'n_clicks'),
+    State('user-input', 'value'),
+    State('chat-history', 'data'),
+    State('uploaded-image-data', 'data'),
+    prevent_initial_call=True
 )
-# Fonksiyon imzası, yukarıdaki Input ve State'lerin sırasına göre güncellenmeli
-# (Inputlar: n_submit, n_clicks; Stateler: user_input, history_data, uploaded_image_data)
-# İmza: def process_user_input(input1, input2, state1, state2, state3) şeklinde olur
 def process_user_input(n_submit, n_clicks, user_input, history_data, uploaded_image_data):
-    # --- MODIFIED TRIGGER CHECK (ctx.triggered_id yerine) ---
-    # Callback'in submit (n_submit > 0) veya buton tıklaması (n_clicks > 0) ile tetiklendiğini kontrol et.
-    # prevent_initial_call=True olduğu için ilk yükleme atlanır.
-    # Sonraki tetiklemelerde, ilgili Input'lardan en az birinin değeri > 0 olacaktır.
-
+    # Tetikleyici kontrolü
     is_triggered_by_submit_or_click = False
     if n_submit is not None and n_submit > 0:
         is_triggered_by_submit_or_click = True
     if n_clicks is not None and n_clicks > 0:
         is_triggered_by_submit_or_click = True
 
-    # Eğer submit veya tıklama ile tetiklenmediyse işlemi atla
     if not is_triggered_by_submit_or_click:
         raise PreventUpdate
 
-    # --- End MODIFIED TRIGGER CHECK ---
+    # Görsel veya metin olup olmadığını kontrol et
+    has_text = user_input and user_input.strip() != ""
+    has_image = uploaded_image_data is not None and 'base64' in uploaded_image_data and uploaded_image_data['base64']
 
-    # Check if there is text input OR image data (base64 content exists)
-    # Eğer metin alanı boş VE resim verisi yoksa işlemi atla (gönderilecek bir şey yok)
-    if (not user_input or user_input.strip() == "") and (
-            uploaded_image_data is None or 'base64' not in uploaded_image_data or not uploaded_image_data['base64']):
+    # Debug için log ekleyin
+    print(f"DEBUG: Kullanıcı mesajı - Metin var mı: {has_text}, Görsel var mı: {has_image}")
+
+    if not has_text and not has_image:
         raise PreventUpdate  # Gönderilecek bir şey yok
 
-    # --- O Anki Zamanı Yakalama ---
-    # Mesaj gönderildiğinde o anki zamanı yakalar, ISO formatında stringe çevirir.
+    # Zaman damgası oluştur
     current_time = datetime.datetime.now().isoformat()
-    # --- Zamanı Yakalama Sonu ---
 
+    # LLM için çok modlu içerik hazırla
+    llm_input_content = []
+    image_url = None
 
-    # --- Prepare Multi-modal Input for LLM ---
-    llm_input_content = []  # Bu liste LLM'ye gönderilecek yeni mesajın içeriğidir (multimodal format)
-    image_url = None  # Sohbet geçmişine kaydetmek için resmin URL'i (Data URL formatında)
-
-    # Eğer metin girdisi varsa, metni LLM girişine ekle
-    if user_input and user_input.strip() != "":
+    # Metin varsa ekle
+    if has_text:
         llm_input_content.append({"type": "text", "text": user_input})
+        print(f"DEBUG: Metin içeriği eklendi: {user_input[:50]}...")
 
-    # Eğer yüklenmiş resim verisi varsa (Base64 olarak)
-    if uploaded_image_data is not None and 'base64' in uploaded_image_data and uploaded_image_data['base64']:
-        # Base64 verisinden LLM için Data URL formatını oluştur
-        content_type_img = uploaded_image_data.get('content_type', 'image/jpeg')
-        base64_string_img = uploaded_image_data['base64']
-        image_url = f"data:{content_type_img};base64,{base64_string_img}" # <-- image_url Data URL formatında
+    # Görsel varsa ekle
+    if has_image:
+        try:
+            content_type_img = uploaded_image_data.get('content_type', 'image/jpeg')
+            base64_string_img = uploaded_image_data['base64']
 
+            # Base64 string'in geçerli olduğunu kontrol et
+            if not base64_string_img or len(base64_string_img) < 10:
+                print("HATA: Geçersiz base64 verisi")
+                raise ValueError("Geçersiz görsel verisi")
 
-        llm_input_content.append({"type": "image_url", "image_url": {"url": image_url}}) # LLM girişine resmi ekle
-        # image_url değişkeni, daha sonra sohbet geçmişi item'ına eklenecek.
+            image_url = f"data:{content_type_img};base64,{base64_string_img}"
 
+            # LLM için görsel içeriği ekle
+            llm_input_content.append({
+                "type": "image_url",
+                "image_url": {"url": image_url}
+            })
 
-    # Eğer llm_input_content hala boş kaldıysa (yukarıdaki kontrollerden geçmemesi gerekirdi)
+            print(f"DEBUG: Görsel içeriği eklendi, content_type: {content_type_img}, base64 uzunluğu: {len(base64_string_img)}")
+        except Exception as e:
+            print(f"HATA: Görsel eklenirken hata oluştu: {e}")
+            # Hata durumunda bile devam et, en azından metin mesajını gönder
+
     if not llm_input_content:
-        print("DEBUG: llm_input_content olusturulamadi, atlama.")
+        print("DEBUG: İçerik oluşturulamadı, atlanıyor.")
         raise PreventUpdate
-
-    # --- LangChain Setup, Memory, ve Chain Definition (Try Block 1) ---
     try:
-        # LLM modelini başlat (llm değişkeni burada tanımlanır)
+        # LLM modelini başlat
         llm = ChatAnthropic(model_name=MODEL_NAME, temperature=0.1, timeout=60, max_retries=2, api_key=api_key)
 
-        # --- Chat Geçmişi Objesini Yeniden Oluştur ---
-        # ConversationBufferMemory yerine doğrudan ChatMessageHistory kullan
-        # ChatMessageHistory sınıfı dosyanın başında doğru yerden import edilmiş olmalı
-        chat_history_object = ChatMessageHistory() # <-- Chat Geçmişi objesini oluştur
+        # Chat geçmişi objesini oluştur
+        chat_history_object = ChatMessageHistory()
 
-        # dcc.Store'daki geçmiş verisini (history_data) ChatMessageHistory objesine ekle
-        # history_data None olabilir (özellikle ilk mesajda hata olursa), kontrol et
+        # Geçmiş verisini ekle
         if history_data is not None:
             for msg_data in history_data:
                 hist_sender = msg_data.get("sender")
                 hist_text = msg_data.get("text")
-                hist_image_url = msg_data.get("image_url") # Geçmiş mesajda resim URL'i var mı kontrol et
-                hist_timestamp_str = msg_data.get("timestamp") # Geçmiş mesajda zaman damgası var mı
+                hist_image_url = msg_data.get("image_url")
 
-                # Geçmişteki mesajın içeriğini LLM'nin anlayacağı formatta listeye dönüştür
+                # Geçmişteki mesajın içeriğini hazırla
                 hist_content_parts = []
-                if hist_text: hist_content_parts.append({"type": "text", "text": hist_text})
-                if hist_image_url: hist_content_parts.append({"type": "image_url", "image_url": {"url": hist_image_url}})
-                # Zaman damgası LLM'ye genellikle content olarak gönderilmez, sadece display için tutulur.
+                if hist_text:
+                    hist_content_parts.append({"type": "text", "text": hist_text})
+                if hist_image_url:
+                    hist_content_parts.append({"type": "image_url", "image_url": {"url": hist_image_url}})
 
-                # ChatMessageHistory objesine mesajı ekle (HumanMessage/AIMessage content'i list of dicts olarak)
-                if hist_sender == "Siz":
+                # ChatMessageHistory'ye ekle
+                if hist_sender == "Siz" and hist_content_parts:
                     chat_history_object.add_message(HumanMessage(content=hist_content_parts))
-                elif hist_sender == "Bot":
-                    # Bot mesajları metin tabanlı varsayılıyor (Eğer botunuz resim de gönderebiliyorsa burayı düzenlemeniz gerekir)
-                    if hist_text:
-                        chat_history_object.add_message(AIMessage(content=hist_text))
+                elif hist_sender == "Bot" and hist_text:
+                    chat_history_object.add_message(AIMessage(content=hist_text))
 
-        # --- Runnable zincirini tanımla (Prompt + LLM) ---
-        # RunnableWithMessageHistory, memory'yi yönetir ve yeni mesajı zincire (prompt + llm) gönderir.
-        # invoke metoduna verilen {'input': ...} değeri prompt'taki {input} değişkenine eşlenir.
-        # Claude modeli ve LangChain, {input} olarak list of dicts formatındaki multimodal içeriği işleyebilmelidir.
+        # Runnable zinciri tanımla
         chain = prompt | llm
 
         # RunnableWithMessageHistory ile zinciri sar
         runnable_with_history = RunnableWithMessageHistory(
-            chain, # Temel zincir (prompt | llm)
-            get_session_history=lambda session_id: chat_history_object, # <-- Oluşturulan ChatMessageHistory objesini sağla
-            input_messages_key="input",  # invoke({"input": ...}) -> prompt'taki {input}
-            history_messages_key="chat_history",  # Chat Geçmişi içeriği -> prompt'taki {chat_history}
+            chain,
+            get_session_history=lambda session_id: chat_history_object,
+            input_messages_key="input",
+            history_messages_key="chat_history",
         )
 
-    except Exception as e:
-        # --- Kurulum veya Hazırlık Sırasında Hata Yönetimi ---
-        print(f"Hata (Kurulum/Hazırlık): {e}");
-        error_detail = str(e)
-        bot_response = f"Bot başlatılırken veya görsel analiz hazırlanırken bir hata oluştu: {e}";
-        # Hata durumunda kullanıcı mesajını (metin+resim+zaman damgası) ve bot hata mesajını geçmişe ekle
-        user_message_history_item = {"sender": "Siz", "text": user_input, "image_url": image_url if image_url else None, "timestamp": current_time} # Kullanıcı mesajı (resim ve zaman damgası ile)
-        bot_message_history_item = {"sender": "Bot", "text": bot_response, "image_url": None, "timestamp": datetime.datetime.now().isoformat()} # Bot hata mesajı (yeni zaman damgası ile)
-        new_messages = [user_message_history_item, bot_message_history_item]
-        # history_data None olabilir (özellikle ilk mesajda hata olursa), kontrol et
-        if history_data is None:
-             updated_history = new_messages
-        else:
-             updated_history = history_data + new_messages # Birleştirme
+        # Debug için log ekle
+        print("DEBUG: LLM ve zincir hazırlandı, istek gönderiliyor...")
 
-        # Hata olsa bile resim store'unu temizle ve önizleme alanını temizle
-        clear_image_data = None
-        clear_preview_children = []
-        # Return updated history, cleared input, cleared image data store, ve temizlenmiş önizleme alanı çocukları
-        return updated_history, "", clear_image_data, clear_preview_children # 4 değeri döndür
-
-    # --- Runnable'ı Çalıştırma (Try Block 2) ---
-    # LLM'ye asıl invoke isteğinin gönderildiği kısım
-    try:
+        # LLM'ye isteği gönder
         config = {"configurable": {"session_id": "my-unique-dash-session-id"}}
-        # Runnable'ı, hazırlanan çok modlu içerik listesiyle çağır
         response = runnable_with_history.invoke(
-            {"input": llm_input_content},  # <-- LLM'ye gönderilen giriş burası (list of dicts)
+            {"input": llm_input_content},
             config=config
         )
 
-        # LLM'den gelen yanıtı al
+        # Yanıtı al
         bot_response = response.content
+        print(f"DEBUG: LLM yanıtı alındı, uzunluk: {len(bot_response)}")
 
     except Exception as e:
-        # --- LLM Invoke Sırasında Hata Yönetimi ---
-        print(f"Hata (LLM Invoke): {e}");
+        print(f"HATA: LLM işlemi sırasında hata: {e}")
         error_detail = str(e)
-        bot_response = f"Görsel analizi veya yanıtı alırken bir hata oluştu: {e}"
+        bot_response = f"Üzgünüm, bir hata oluştu: {error_detail}"
 
+    # Geçmişi güncelle
+    user_message_history_item = {
+        "sender": "Siz",
+        "text": user_input if has_text else "",
+        "image_url": image_url if has_image else None,
+        "timestamp": current_time
+    }
 
-    # --- Geçmişi Güncelle ve Return Et ---
-    # Update history with the sent user message (text + image) and the bot response
-    # Kullanıcı mesajı item'ını (metin+resim+zaman damgası) ve bot yanıtını geçmişe ekle
-    user_message_history_item = {"sender": "Siz", "text": user_input, "image_url": image_url if image_url else None, "timestamp": current_time} # Kullanıcı mesajı (resim ve zaman damgası ile)
-    # Bot yanıtına da zaman damgası ekle (genellikle LLM'nin yanıtladığı zamandır, ama basitlik için aynı callback zamanını kullanalım)
-    bot_message_history_item = {"sender": "Bot", "text": bot_response, "image_url": None, "timestamp": datetime.datetime.now().isoformat()} # Bot mesajı (yeni zaman damgası ile)
-
+    bot_message_history_item = {
+        "sender": "Bot",
+        "text": bot_response,
+        "image_url": None,
+        "timestamp": datetime.datetime.now().isoformat()
+    }
 
     new_messages = [user_message_history_item, bot_message_history_item]
 
-    # history_data None olabilir, birleştirme öncesi kontrol et
+    # Geçmişi güncelle
     if history_data is None:
         updated_history = new_messages
     else:
-        updated_history = history_data + new_messages # Birleştirme
+        updated_history = history_data + new_messages
+
+    # Temizleme işlemleri
+    clear_image_data = None  # Görsel verisini temizle
+    clear_preview_children = []  # Önizleme alanını temizle
+
+    # Sonuçları döndür
+    return updated_history, "", clear_image_data, clear_preview_children
 
 
-    # --- Gönderdikten sonra yüklenen resim verisi store'unu temizle ve önizleme alanını temizle ---
-    clear_image_data = None # uploaded-image-data store'unu None yap
-    clear_preview_children = [] # Önizleme div'ini boşalt
-
-    # Return updated history, cleared input, cleared image data store, ve temizlenmiş önizleme alanı çocukları (4 değer)
-    return updated_history, "", clear_image_data, clear_preview_children # 4 değeri döndür
 
 # --- process_user_input callback code sonu ---
 
@@ -833,69 +972,63 @@ def process_user_input(n_submit, n_clicks, user_input, history_data, uploaded_im
 
 
 # --- CALLBACK: Yüklenen Resmi İşleme ---
-# dcc.Upload bileşeni (id='upload-image') tetiklendiğinde çalışır.
-# Yüklenen dosyanın Base64 içeriğini alır ve 'uploaded-image-data' Store'una kaydeder.
-# Ayrıca, resim önizlemesini 'image-preview-area' div'inde gösterir.
 @app.callback(
-    # Output 1: Yüklenen resim verisi store'una kaydet
-    Output('uploaded-image-data', 'data', allow_duplicate=True), # Store data
-    # --- YENİ ÇIKTI: Resim önizlemesini 'image-preview-area' div'ine yaz ---
-    Output('image-preview-area', 'children'), # <-- 2. Çıktı: Resim önizleme alanının çocuklarını güncelle
-    # --- YENİ ÇIKTI SONU ---
-
-    Input('upload-image', 'contents'),  # Input 1
-    State('upload-image', 'filename'),  # State 1
-    State('upload-image', 'last_modified'),  # State 2
-    # Artık chat-log children'a çıktı vermiyoruz, bu state'lere gerek yok
-    # State('chat-log', 'children'), # State 3 - SİLİN
-    # State('theme-store', 'data'), # State 4 - SİLİN
-    prevent_initial_call=True  # İlk yüklemede çalışmasını engelle
+    Output('uploaded-image-data', 'data', allow_duplicate=True),
+    Output('image-preview-area', 'children'),
+    Input('upload-image', 'contents'),
+    State('upload-image', 'filename'),
+    State('upload-image', 'last_modified'),
+    prevent_initial_call=True
 )
-# Fonksiyon imzası güncellendi (Chat log children ve theme state'leri kaldırıldı)
-def process_uploaded_image(contents, filename, last_modified): # <-- İmza güncellendi
-    # contents None değilse (yani bir dosya yüklendiyse)
+def process_uploaded_image(contents, filename, last_modified):
     if contents is not None:
-        image_data_to_store = None
-        image_preview_element = None # Oluşturulacak önizleme elementi
-
         try:
+            # Debug için log ekleyin
+            print(f"DEBUG: Görsel yükleniyor: {filename}")
+
             # contents Base64 formatında gelir
             content_type, content_string = contents.split(',')
+
+            # Base64 verisini doğru şekilde kaydet
             image_data_to_store = {
                 'base64': content_string,
                 'filename': filename,
                 'content_type': content_type
-                }
-            base64_image_url = f"data:{content_type};base64,{content_string}" # Data URL'i oluştur
+            }
 
-            # Resim önizleme elementini oluştur (basit html.Img)
-            image_preview_element = html.Img(src=base64_image_url, style={
-                'maxWidth': '200px', # Önizleme boyutu
-                'height': 'auto',
-                'margin': '10px auto', # Ortala (eğer parent container ortalamaya uygunsa)
-                'display': 'block', # Block element yap
-            })
-            # İsteğe bağlı: Önizleme altına dosya adı veya bir başlık ekle
-            # filename_display = html.Div(filename, style={'textAlign': 'center', 'fontSize': '0.8em', 'color': '#555'})
-            # image_preview_element = html.Div([image_preview_element, filename_display], style={'textAlign': 'center'}) # Resim ve metni grupla ve ortala
+            # Tam data URL'i oluştur
+            base64_image_url = f"data:{content_type};base64,{content_string}"
 
+            # Daha belirgin bir önizleme elementi oluştur
+            image_preview_element = html.Div([
+                html.H6(f"Yüklenen Görsel: {filename}", style={
+                    'marginBottom': '10px',
+                    'fontSize': '0.9rem',
+                    'color': '#666'
+                }),
+                html.Img(src=base64_image_url, style={
+                    'maxWidth': '250px',
+                    'height': 'auto',
+                    'margin': '0 auto',
+                    'display': 'block',
+                    'border': '1px solid #ddd',
+                    'borderRadius': '4px',
+                    'padding': '4px'
+                })
+            ], style={'textAlign': 'center', 'padding': '10px'})
+
+            print("DEBUG: Görsel önizleme oluşturuldu")
+            return image_data_to_store, image_preview_element
 
         except Exception as e:
-            print(f"Hata: Yüklenen dosya işlenirken sorun oluştu: {e}")
-            # Dosya işlenirken hata olursa, önizleme alanında hata mesajı göster
-            image_preview_element = html.Div("Hata: Resim yüklenemedi veya işlenirken sorun oluştu.", style={'color': 'red', 'textAlign': 'center'})
+            print(f"HATA: Görsel işlenirken sorun oluştu: {e}")
+            error_element = html.Div([
+                html.H6("Görsel Yükleme Hatası", style={'color': 'red'}),
+                html.P(f"Hata: {str(e)}")
+            ])
+            return None, error_element
 
-
-        # Outputları döndür: 1) image_data_to_store (Store'a kaydedilecek), 2) image_preview_element (Önizleme div'ine yazılacak)
-        # Dönüş değerlerinin sırası Output listesindeki sırayla aynı olmalı.
-        return image_data_to_store, image_preview_element # 2 değeri döndür
-
-
-    # Eğer contents None ise (dosya seçme işlemi iptal edildiyse veya yükleme başarısız olduysa)
-    # Callback'i atla VE önizleme alanını temizle
-    print("DEBUG: Upload canceled or failed.")
-    # None dönmek Store'u temizler. [] dönmek önizleme div'inin çocuklarını temizler.
-    return None, [] # Store'a None yaz, Önizleme div'ini boşalt
+    return None, []
 
 
 # --- CALLBACK SONU ---

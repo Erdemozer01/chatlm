@@ -77,11 +77,13 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
             // Eğer bu JS fonksiyonu Clientside callback ile tetiklenirse,
             // ve outputları Output('offcanvas-menu', 'className'), Output('offcanvas-open', 'data') ise,
             // dönüş değeri [yeni_class_name_stringi, yeni_store_değeri] olmalıdır.
-             let classesList = current_classes ? current_classes.split(' ') : [];
-             let new_classesList = classesList.filter(cls => cls !== 'menu-open');
-             if (new_state) { new_classesList.push('menu-open'); }
-             let new_classes = new_classesList.join(' ');
-             return [new_classes, new_state];
+            let classesList = current_classes ? current_classes.split(' ') : [];
+            let new_classesList = classesList.filter(cls => cls !== 'menu-open');
+            if (new_state) {
+                new_classesList.push('menu-open');
+            }
+            let new_classes = new_classesList.join(' ');
+            return [new_classes, new_state];
         },
 
         // --- LOGOUT FORMU SUBMIT ETME FONKSİYONU ---
@@ -169,5 +171,90 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
 
         // --- DİĞER CLIENTSIDE FONKSİYONLARI BURAYA EKLENEBİLİR ---
 
+
     } // <-- 'clientside' namespace'i sonu
 }); // <-- window.dash_clientside objesi tanımı sonu
+
+// static/js/clientside.js dosyasına eklenecek kod
+if (!window.dashExtensions) {
+    window.dashExtensions = {};
+}
+
+window.dashExtensions.clientside = {
+
+    // Mevcut submitLogoutForm fonksiyonu
+    submitLogoutForm: function(n_clicks) {
+        if (n_clicks > 0) {
+            // Logout formu gönder
+            document.getElementById('logout-form').submit();
+        }
+        return n_clicks;
+    },
+
+    // Ekran boyutu değiştiğinde offcanvas menüyü otomatik kapat
+    handleResize: function(n, is_open) {
+        // İlk yükleme kontrolü - sadece ekran boyutu değiştiğinde çalışsın
+        if (n === 0) return is_open;
+
+        // Küçük ekranlarda (mobil) offcanvas menüyü otomatik kapat
+        if (window.innerWidth <= 768 && is_open) {
+            return false;
+        }
+
+        return is_open;
+    },
+
+    // Mesaj alanında Enter tuşu davranışı (Shift+Enter için yeni satır, sadece Enter için gönder)
+    handleEnterKey: function(n_submit, n_clicks, value) {
+        document.getElementById('user-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('send-button').click();
+            }
+        });
+
+        return window.dash_clientside.no_update;
+    },
+
+    // Sohbet günlüğünü otomatik kaydır
+    scrollChatToBottom: function(chat_history) {
+        const chatLog = document.getElementById('chat-log');
+        if (chatLog) {
+            setTimeout(() => {
+                chatLog.scrollTop = chatLog.scrollHeight;
+            }, 100);
+        }
+        return window.dash_clientside.no_update;
+    }
+};
+
+// Ekran boyutu değişimini dinle
+window.addEventListener('resize', function() {
+    // Küçük ekranlarda offcanvas menüyü otomatik kapat
+    if (window.innerWidth <= 768) {
+        // Dash uygulamasının store verilerini doğrudan değiştiremeyiz,
+        // Bu nedenle bir event dispatch ederek callback'i tetikliyoruz
+        const resizeEvent = new CustomEvent('windowResize', {
+            detail: { width: window.innerWidth, height: window.innerHeight }
+        });
+        document.dispatchEvent(resizeEvent);
+    }
+});
+
+// Sayfa yüklendiğinde çalışacak kod
+window.addEventListener('DOMContentLoaded', function() {
+    // Mobil cihazlarda dokunmatik kaydırma iyileştirmeleri
+    const chatLog = document.getElementById('chat-log');
+    if (chatLog) {
+        chatLog.style.WebkitOverflowScrolling = 'touch';
+    }
+
+    // İnput alanı için otomatik yükseklik ayarı
+    const userInput = document.getElementById('user-input');
+    if (userInput) {
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+});

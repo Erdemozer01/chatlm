@@ -44,23 +44,20 @@
     {% plotly_direct name="ChatLLM" %}
 </main>
 
-{# --- LOGOUT FORMU EKLENİYOR --- #}
-{# Bu form gizli olacak (display: none) ve Dash butonuyla (Clientside JS aracılığıyla) tetiklenecek. #}
-{# action="/logout/" veya {% url 'logout' %} şeklinde Django'daki logout URL'ine işaret etmeli. #}
-{# method="post" olarak ayarlandı ve güvenlik için CSRF token içeriyor. #}
+{# --- LOGOUT FORMU --- #}
+
 <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
     {% csrf_token %} {# Django'nun POST istekleri için istediği güvenlik token'ı. ZORUNLUDUR. #}
     {# Formun içinde bir submit butonu olabilir ama gizli olduğu için görünmemesi sorun değil #}
     <button type="submit">Logout</button>
 </form>
-{# --- LOGOUT FORMU SONU --- #}
+{# --- LOGOUT FORMU --- #}
 
 
 {# django-plotly-dash tarafından sağlanan Dash footer için gerekli JS dosyaları #}
 {% plotly_footer %}
 
-{# Clientside JavaScript dosyasını yükleyin. Form ve plotly_footer'dan sonra yüklenmesi önemlidir. #}
-{# Kendi static dizin yapınıza göre yolu ayarlayın. #}
+
 <script src="{% static 'js/clientside.js' %}"></script>
 
 
