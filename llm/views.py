@@ -1,14 +1,14 @@
 # llm/views.py - COMPLETE AND FINAL CODE
-import base64
-import io
+
+
 import os
 import datetime
 
 # Dash importları
-from dash import dcc, html, Input, Output, State, ctx, ALL, MATCH, clientside_callback, DiskcacheManager, no_update
+from dash import dcc, html, Input, Output, State, ctx, no_update
 
 # Clientside Callback için importlar
-from dash import clientside_callback, ClientsideFunction
+from dash import ClientsideFunction
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 
@@ -31,10 +31,6 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import HumanMessage, AIMessage
 
 from dotenv import load_dotenv
-
-# BASE_DIR, Path(__file__).resolve().parent.parent # Kullanılmıyorsa kaldırılabilir
-
-external_style = 'https://use.fontawesome.com/releases/v5.8.2/css/all.css'  # Font Awesome v5
 
 # .env dosyasını yükle
 load_dotenv()
@@ -64,18 +60,16 @@ Human: {input}
 AI:
 """)
 
+fontawesome = 'https://use.fontawesome.com/releases/v5.8.2/css/all.css'  # Font Awesome v5
 custom_css = "static/css/style.css"
 custom_js = "static/js/clientside.js"
 
 # --- DjangoDash uygulamasını oluşturma ---
 app = DjangoDash(
     name='ChatLLM',
-    external_stylesheets=[dbc.themes.BOOTSTRAP, external_style, custom_css],
+    external_stylesheets=[dbc.themes.BOOTSTRAP, fontawesome, custom_css],
     external_scripts=[custom_js],
     suppress_callback_exceptions=True,
-    meta_tags=[
-        {"name": "viewport", "content": "width=device-width, initial-scale=1.0"}
-    ]
 )
 
 
@@ -211,7 +205,6 @@ def ChatLmmView(request):
     )  # app.layout sonu
 
     return render(request, 'llm.html')
-
 
 # llm/views.py dosyasında, herhangi bir fonksiyonun dışında, örneğin diğer callback'lerden önce veya sonra
 
